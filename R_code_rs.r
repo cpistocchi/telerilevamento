@@ -38,5 +38,5 @@ cl <- colorRampPalette(c("black", "grey", "light grey")) (100)
 plot(l2011, col = cl) #cioè i colori sono presi dalla scala impostata
 #la banda 4 è molto intensa (molto bianca, riflettanza molto alta), dell'infrarosso, ed è normale se c'è della vegetazione
 
-#crs significa coordinate reference system, cioè il SR delle coordinate
+#crs significa coordinate reference system, cioè il SR delle coordinate, qui utm e zona 22, e a questo fuso sono riferite le coordinate.
 
