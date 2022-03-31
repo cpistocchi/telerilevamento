@@ -1,0 +1,91 @@
+#INDICI SPETTRALI/INDICI DI VEGETAZIONE
+#sono necessarie:
+library(raster)
+library(RStoolbox) #libreria sviluppata per elaborare dati spettrali)
+
+#settaggio della working directory
+setwd("C:/lab/")
+
+#come dati usiamo due time frame (agosto 2006 e luglio 1992) riferiti al Rio Peixoto ottenute dall'Earth Observatory della NASA
+#nella cartella lab sono chiamati defor_1 e defor_2
+#importiamo il primo file defor_1 assegnandolo a un oggetto chiamato l1992
+l1992 <- brick("defor1_.jpg")
+#nell'esecuzione vi è un errore perchè è richiesta l'installazione del pacchetto rgdal. 
+#rgdal è una libreria che è riferita a gdal (Geospatial Data Abstraction Library)
+install.packages("rgdal")
+library(rgdal)
+l1992 <- brick("defor1_.jpg") #ora funziona
+#vediamo le informazioni di questa immagine
+l1992
+#class : RasterBrick, significa che è un'immagine con tanti livelli
+#dimensions : sono presenti 3 sole bande (nlayers, l'ultimo argomento)
+#resolution: la risoluzione in questo caso è una risoluzione immagine, non è un'immagine georeferenziata, proprio perchè scaricata direttamente dall'Erath Observatory della NASA
+#names: defor1_.1, defor1_.2, defor1_.3 (sono i nomi dei layer dell'immagine)
+#min values: 0, 0, 0
+#max values: 255, 255, 255
+#i valori vanno da 0 a 255! nel codice precedente invece andavano da 0 a 1 i valori di riflettanza.
+#questo avviene perchè l'immagine è a 8 bit
+
+#non conosciamo a quale banda corrisponde ogni layer quindi cerchiamo di capirlo facendo qualche plot usando lo schema RGB
+plotRGB(l1992, r=1, g=2, b=3, stretch="lin") #proviamo associando le bande 1 a red, 2 a green e 3 a blue
+#in base all'immagine prodotta (molto rossa) vogliamo capire quale è la banda che ha portato la vegetazione a sembrare rossa.
+#poiché l'immagine è molto rossa in corrispondenza delle zone con vegetazione, la bande 1 che abbiamo assegnato a red è l'IR
+#in questa immagine, la banda numero 1 è NIR (associata a r)
+#poichè solitamente le bande si montano in sequenza, teoricamente in questa immagine
+#la banda 2 è il rosso (associato a g)
+#la banda 3 è il verde (associato a b)
+
+#facciamo lo stesso per la seconda immagine
+#importa il seconda file defor2_ e assegnalo a un oggetto di nome l2006
+l2006 <- brick("defor2_.jpg") #ora funziona
+#vediamo le informazioni di questa immagine
+l2006
+#plottiamola con schema RGB
+plotRGB(l2006, r=1, g=2, b=3, stretch="lin")
+#le zone rosse sono molto minori, e quindi la vegetazione è stata eliminata molto in questa zona per far spazio alle attività umane come l'agricoltura ecc
+
+#plottiamo in un multiframe le due immagini, una sopra all'altra
+par(mfrow = c(2, 1))
+plotRGB(l1992, r=1, g=2, b=3, stretch="lin")
+plotRGB(l2006, r=1, g=2, b=3, stretch="lin")
+#si vede il Rio Peixoto in due situazioni diverse.
+#solitamente l'acqua assorbe molto NIR e quindi l'immagine in corrispondenza del fiume è nera, blu scura.
+#nell'immagine più recente accade questo, con l'acqua del fiume molto scura (assorbe molto NIR)
+#nell'immagine del 1992 invece l'acqua è molto più chiara (comunque non rossa), a indicare che probabilmente nel fiume vi era molto sedimento (dovuto a piogge intense nel periodo dell'acquisizione)
+#si può capire che è la stessa zona geografica non tanto per il fiume (che con i suoi meandri può portare a conclusioni sbagliate), ma osservando il patch centrale
+#nel terreno rimasto inalterato nel tempo come forma
+
+#DVI Difference Vegetation Index
+#lo usiamo per calcolare la salute della vegetazione di questa zona nel 1992 e nel 2006
+#DVI è la differenza fra riflettanze: NIR - red
+#lo calcolo usando gli elementi, con le [[ ]]
+dvi1992 = l1992[[1]] - l1992[[2]] #oppure uso <-
+#oppure posso calcolarlo così, con i nomi delle bande: dvi1992 = l1992$defor1_.1 - l1992$defor1_.2
+dvi1992
+# valori minimi e max di DVI nell'immagine sono -114 e 248.
+#per visualizzare il DVI ottenuto uso una colorRampPalette personalizzata
+cl <- colorRampPalette(c("darkblue", "yellow", "red", "black"))(100)
+plot(dvi1992, col=cl)
+#ciò che nell'immagine è rosso scuro è vegetazione in salute
+#ciò che è giallo è vegetazione non in salute (fatta eccezione per il fiume, che è giallo ma non è vegetazione)
+
+#facciamo lo stesso per il 2006
+dvi2006 = l2006[[1]] - l2006[[2]] 
+dvi2006
+plot(dvi2006, col=cl)
+#in questa immagine le zone gialle sono tantissime: c'è stata tantissima deforestazione e si vede molto bene la differenza rispetto al 1992
+#la foresta è molto frammentata: per degradare un habitat non è necessario distruggerlo del tutto, ma generare frammentazione fra popolazioni
+#(che porta a un maggior rischio di estinzione della popolazione o della specie)
+#in questa zona si stanno estinguendo i colubi rossi, primati a rischio per degrado del loro habitat
+#scelta dei colori: il giallo è uno dei colori che colpisce di più la retina, quindi si vede subito e porta l'attenzione sugli elementi di quel colore
+
+#per comparare il DVI di un px dell'immagine fra il 1992 e il 2006 (se è avvenuta deforestazione si assiste a una diminuzione del DVI in quel punto), facciamo la differenza fra i DVI
+dvi_dif = dvi1992 - dvi2006
+cld <- colorRampPalette(c("blue", "white", "red"))(100)
+plot(dvi_dif, col=cld)
+#in questa immagine, dove si ha una differenza positiva si hanno valori rossi (e quindi è avvenuta deforestazione, perchè DVI nel 1992 è maggiore del DVI del 2006 e la differenza è positiva)
+#le zone molto rosse sono quelle colpite da una fortissima deforestazione
+
+#la funzione spectralIndices è una funzione del pacchetto RStoolbox, che serve per calcolare tutti gli indici insieme
+
+
