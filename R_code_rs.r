@@ -192,3 +192,4 @@ plotRGB(l2011, r=4, g=3, b=2, stretch="lin")
 #l'immagine del 1988 ha un po' più di foschia nel sensore, perchè è usato un sensore diverso.
 #nel 1988 l'uomo aveva appena iniziato ad aprire le prime strade e campi coltivati nella foresta, non troppo degradata
 #nel 2011 invece si ha una delimitazione netta fra suolo nudo e foresta (perchè c'è un limite definito fra foresta e sistema agricolo dato dall'istituzione della foresta)
+
