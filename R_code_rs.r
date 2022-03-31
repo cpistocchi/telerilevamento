@@ -128,3 +128,67 @@ plot(l2011$B3_sre, col = clr)
 #banda NIR (near infrared)
 clnir<- colorRampPalette(c("red", "orange", "yellow")) (100)
 plot(l2011$B4_sre, col = clnir)
+
+#combinazione di più bande per formare un'immagine a colori
+#carichiamo il pacchetto raster
+library(raster)
+#facciamo il settaggio della workind directory perchè i file raster sarebbero salvati in maniera estemporanea 
+#e rischierebbero di andare persi se avvenissero problemi al computer oppure se volessimo inviarli a qualcuno
+setwd("C:/lab/") #per windows
+#importare dati su R, in particolare dati raster:
+l2011 <- brick("p224r63_2011.grd")
+#ci troviamo della riserva di Parakana in Brasile e qui la deforestazione della foresta tropicale è stata pesantissima.
+#plot dell'immagine solo nell'infrarosso vicino (NIR)
+plot(l2011$B4_sre) #plottaggio delle riflettanze nella banda del NIR
+#oppure
+plot(l2011$[[4]])
+#per cambiare i colori della legenda
+clnir<- colorRampPalette(c("red", "orange", "yellow")) (100)
+plot(l2011$B4_sre, col = clnir)
+
+#plot dei layer RGB
+plotRGB(l2011, r=3, g=2, b=1, stretch="lin")
+#il primo argomento è il nome dell'immagine
+#i successivi 3 argomenti associano alle componenti RGB le corrispondenti bande:
+        #r <- banda 3 (rosso)
+        #g <- banda 2 (verde)
+        #b <- banda 1 (blu)
+#l'argomento successivo è "stretch", che stretcha, amplia i valori per far sì che si vedano meglio i contrasti.
+        #può essere lineare ("lin") o a istogrammi ("hist")
+#si ottiene l'immagine a colori "naturali". nella parte sinistra rimangono dei punti in cui non sono registrati valori, e si vedono come delle zone nere ("maschera").
+#quindi l'immagine che si ottiene è quella della riserva naturale, da 800 km di distanza, così come la vedrebbe l'occhio umano.
+
+#per vedere il NIR mediante schema RGB facciamo "scorrere" la bande, in modo da plottare insieme NIR, rosso e verde (escludendo la banda del blu, la più lontana)
+plotRGB(l2011, r=4, g=3, b=2, stretch="lin")
+#la banda dell'infrarosso viene associata alla componente red di RGB, quindi nell'immagine riflettanza elevata nell'infrarosso viene percepito come rosso intenso
+#tutti gli elementi che riflettono nel NIR saranno molto rossi (ad esempio la vegetazione).
+#la presenza di vegetazione è meglio evidenziabile dalla riflettanza del NIR rispetto a quella nel verde.
+#nella parte centrale-sinistra dell'immagine si vede quindi molta vegetazione, foresta tropicale.
+
+#voglio visualizzare il NIR come verde, invertendo l'assegnazione della bande del NIR e del rosso fra R e G
+plotRGB(l2011, r=3, g=4, b=2, stretch="lin")
+#tutto quello che rifletterà nel NIR diventerà verde nell'immagine
+
+#per evidenziare la parti a suolo nudo posso fare:
+plotRGB(l2011, r=3, g=2, b=4, stretch="lin")
+#dunque la vegetazione (che riflette nel NIR) sarà blu, mentre il suolo nudo sarà giallo
+
+#proviamo a vedere il risultato visibile nella gamma dei colori usando l'argomento hist in stretch
+plotRGB(l2011, r=3, g=4, b=2, stretch="hist")
+
+#esercizio: costruisci un multiframe con immagini in "visibile RGB" (colori naturali, stretch lineare) in cima a falsi colori (usando il NIR, stretch a istogrammi)
+par(mfrow = c(2, 1))
+plotRGB(l2011, r=3, g=2, b=1, stretch="lin")
+plotRGB(l2011, r=3, g=4, b=2, stretch="hist")
+
+#carica l'immagine dello stesso sito nel 1988 e la assegno a un oggetto di nome l1988
+l1988 <- brick("p224r63_1988.grd")
+l1988
+
+#in un multiframe confronto l'immagine nel 1988 e nel 2011, con il NIR nella componente R e stretch lineare:
+par(mfrow = c(2, 1))
+plotRGB(l1988, r=4, g=3, b=2, stretch="lin")
+plotRGB(l2011, r=4, g=3, b=2, stretch="lin")
+#l'immagine del 1988 ha un po' più di foschia nel sensore, perchè è usato un sensore diverso.
+#nel 1988 l'uomo aveva appena iniziato ad aprire le prime strade e campi coltivati nella foresta, non troppo degradata
+#nel 2011 invece si ha una delimitazione netta fra suolo nudo e foresta (perchè c'è un limite definito fra foresta e sistema agricolo dato dall'istituzione della foresta)
