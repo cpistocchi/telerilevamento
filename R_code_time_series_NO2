@@ -1,0 +1,39 @@
+#diminuzione NO2 nel periodo di lockdown in Europa
+
+library(raster)
+
+setwd("C:/lab/en")
+
+en01 <- raster("EN_0001.png")
+cl <- colorRampPalette(c('red','orange','yellow'))(100) #
+plot(en01, col=cl)
+en13 <- raster("EN_0013.png")
+plot(en13, col=cl)
+
+#importiamo tutti i dati (da gennaio a marzo)
+rlist <- list.files(pattern="EN") #facciamo una lista di tutti i file che vogliamo incorporare (qui tutti hanno "EN" nel nome)
+rimp <- lapply(rlist, raster) #applichiamo alla lista rlist la funzione raster (cioè l'importazione)
+en <- stack(rimp)
+
+#plottiamo il tutto
+plot(en, col=cl)
+
+#ora plottiamo vicine fra loro EN01 ed EN13
+par(mfrow=c(1,2))
+plot(en[[1]], col=cl)
+plot(en[[13]], col=cl)
+#oppure
+en113 <- stack(en[[1]], en[[13]])
+plot(en113, col=cl)
+
+#otteniamo poi una differenza dei dati, con una scala da blu a rosso per vedere dove NO2 è aumentato o diminuito
+difen <- en[[1]] - en[[13]]
+cldif <- colorRampPalette(c('blue','white','red'))(100) #
+plot(difen, col=cldif)
+
+#facciamo un plotRGB con tutti i dati
+plotRGB(en, r=1, g=7, b=13, stretch="lin")
+#in cui
+#rosso: gennaio
+#verde: febbraio
+#blu: marzo
