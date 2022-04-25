@@ -1,0 +1,59 @@
+#generare mappe di land cover da immagini da satellite
+library(raster)
+library(RStoolbox) #contiene le funzioni per la classificazione
+
+setwd("C:/lab/")
+
+#importiamo le immagini di rio Peixoto in due momenti diversi (1992 e 2006)
+l92 <- brick("defor1_.jpg")
+plotRGB(l92, 1, 2, 3, stretch="lin")
+#in cui 
+#NIR=1
+#rosso=2
+#verde=3
+
+#importiamo anche defor2 e plottiamo le due immagini in una finestra
+l06 <- brick("defor2_.jpg")
+par(mfrow=c(2, 1))
+plotRGB(l92, 1, 2, 3, stretch="lin")
+plotRGB(l06, 1, 2, 3, stretch="lin")
+
+#installiamo il pacchetto ggplot2
+install.packages("ggplot2")
+library(ggplot2)
+
+#per unire le immagini in un multifrmae si usa il pacchetto patchwork
+istall.packages("patchwork)
+library(patchwork)
+
+plot1 <- ggRGB(l92, 1, 2, 3, stretch="lin") #si scrive come un plotRGB
+plot2 <- ggRGB(l06, 1, 2, 3, stretch="lin")
+plot1 + plot2 #multiframe senza dover fare par(mfrow...). I due plot sono uno accanto all'altro
+plot1 / plot2 #multiframe con i due plot uno sopra all'altro
+
+#facciamo una classificazione dell'immagine del 1992
+l92c <- unsuperClass(l92, nClasses=2)
+#l92c è un modello, e vogliamo farne il plor della mappa
+plot(l92c$map)
+#classe 1 (bianca) è la foresta
+#classe 2 (verde) è  aree agricole+acqua
+#ora facciamo lo stesso per l'immagine del 2006
+l06c <- unsuperClass(l06, nClasses=2)
+plot(l06c$map)
+#classe 1 (bianca) è area agricola 
+#classe 2 (verde) è foresta (lo vedo dal colore del patch di foresta rimasto invariato negli anni)
+
+#vogliamo confrontare l'area, di copertura forestale fra il 1992 e 2006.
+#usiamo la funzione freq che permette di rappresentare la frequenza (numero di px) per ogni classe.
+freq(l92c$map)
+#value: indica la classe
+#count: indica il numero di pixel appartenenti a quella classe
+#in questo caso:
+#classe 1: 305213 pixel (circa) FORESTA
+#classe 2: 36079 pixel (circa) AREE AGRICOLE
+#facciamo lo stesso per il 2006
+freq(l06c$map)
+#classe 1: 165124 pixel (circa) AREE AGRICOLE
+#classe 2: 177602 pixel (circa) FORESTA
+
+
