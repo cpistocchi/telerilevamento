@@ -122,3 +122,13 @@ geom_bar(stat="identity", fill="white")
 #facciamo lo stesso grafico per il 2006
 ggplot(multitemporal, aes(x=class, y=percent_2006, col=class)) +
 geom_bar(stat="identity", fill="white")
+
+#creiamo pdf con questi grafici
+pdf("percentages_1992.pdf")
+ggplot(multitemporal, aes(x=class, y=percent_1992, col=class)) +
+geom_bar(stat="identity", fill="white")
+dev.off()
+pdf("percentages_2006.pdf")
+ggplot(multitemporal, aes(x=class, y=percent_2006, col=class)) +
+geom_bar(stat="identity", fill="white")
+dev.off()
