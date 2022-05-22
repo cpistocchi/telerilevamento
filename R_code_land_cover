@@ -23,7 +23,7 @@ install.packages("ggplot2")
 library(ggplot2)
 
 #per unire le immagini in un multifrmae si usa il pacchetto patchwork
-istall.packages("patchwork)
+install.packages("patchwork")
 library(patchwork)
 
 plot1 <- ggRGB(l92, 1, 2, 3, stretch="lin") #si scrive come un plotRGB
@@ -33,7 +33,7 @@ plot1 / plot2 #multiframe con i due plot uno sopra all'altro
 
 #facciamo una classificazione dell'immagine del 1992
 l92c <- unsuperClass(l92, nClasses=2)
-#l92c è un modello, e vogliamo farne il plor della mappa
+#l92c è un modello, e vogliamo farne il plot della mappa
 plot(l92c$map)
 #classe 1 (bianca) è la foresta
 #classe 2 (verde) è  aree agricole+acqua
@@ -56,4 +56,69 @@ freq(l06c$map)
 #classe 1: 165124 pixel (circa) AREE AGRICOLE
 #classe 2: 177602 pixel (circa) FORESTA
 
+#vogliamo calcolare la quota di px di una classe sul totale di px dell'immagine
+#per capire il numero tot di px basta richiamare il nome dell'immagine:
+l92
+#alla voce "dimensions" troviamo il numero di righe, colonne e totale di px (qui 341292)
+#associamo a un oggetto chiamato tot92 il numero di px totali nell'immagine del 1992
+tot92 <-341292
+#calcoliamo ora la proporzione di foresta nel 1992 (numero di px foresta / numero px totali)
+prop_forest_92 <- 305213 / tot92
+prop_forest_92
+#in questo caso è 0.894287 (quindi l'89.42% è foresta)
+#se voglio il valore % posso scrivere
+perc_forest_92 <- 305213 * 100 / tot92
 
+#cacoliamo ora la proporzione delle aree agricole nel 1992
+prop_agr_92 <- 36079 / tot92
+#oppure
+prop_agr_92 <- 1 - prop_forest_92  
+#le % si calcolano come
+perc_agr_92 <- 36079 * 100 / tot92
+#oppure
+perc_agr_92 <- 100 - perc_forest_92  
+
+#calcoliamo questa proporzione anche per le immagini del 2006
+l06
+perc_forest_06 <- 177602 * 100 / tot06
+perc_forest_06
+perc_agr_06 <- 100 -  perc_forest_06
+perc_agr_06
+
+#DATI FINALI
+#nel 1992:
+percent_forest_1992: 89.4287%
+percent_agr_1992: 10.5713%
+#nel 2006
+percent_forest_06: 51.8204
+percent_agr_06:  48.1796
+#grazie alla classificazione abbiamo potuto passare a immagini qualitative a dati in px e loro elaborazioni numeriche
+
+#costruiamo un DATAFRAME, cioè una tabella.
+#questo dataframe avrà 3 colonne: classe (class), i valori % del 1992 e i % del 2006.
+#ogni quadratino, cella, della tabella, si chiama ISTANZA
+#colonne o campi:
+class <- c("Forest", "Agriculture") #la prima colonna ha questi due valori
+percent_1992 <- c(89.4287, 10.5713) #la seconda colonna ha questi due valori
+percent_2006 <- c(51.8204, 48.1796) #la terza colonna ha questi due valori
+#abbiamo dichiarato le colonne e i dati che contengono
+#creiamo il dataframe e lo associamo al nome "multitemporal"
+multitemporal <- data.frame(class, percent_1992, percent_2006)
+multitemporal
+#per vederla in formato tabella
+View(multitemporal)
+
+#ora facciamo un grafico bar chart usando il pacchetto grafico ggplot2
+#in questo caso, vogliamo fare un grafico barplot riferito alla situazione nel 1992 (quindi due colonne, una di copertura forestale e l'altra di agricola).
+ggplot(multitemporal, aes(x=class, y=percent_1992, col=class))
+#in aesthetics specifichamo "class", poichè vogliamo ottenere due colonne, una per Forest e una Agriculture, nelle x
+#nelle y l'altezza delle due colonnine deve dipendere dal valore che avevano le due classi nel 1992
+#il colore deve dipendere dalla categoria foresta o agricoltura.
+#il codice scritto così però crea un ggplot vuoto, mentre dobbiamo specificare che venga creato un bar chart (bar plot)
+#per creare un bar chart è necessario sommare le funzioni ggplot e geom_bar (che permette di creare bar chart)
+ggplot(multitemporal, aes(x=class, y=percent_1992, col=class)) +
+geom_bar(stat="identity", fill="white")
+
+#facciamo lo stesso grafico per il 2006
+ggplot(multitemporal, aes(x=class, y=percent_2006, col=class)) +
+geom_bar(stat="identity", fill="white")
