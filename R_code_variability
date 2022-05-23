@@ -1,1 +1,74 @@
+library(raster)
+library(RStoolbox) #per calcolare la variabilità e visualizzare l'immagine
+library(ggplot2) #per vedere l'immagine e fare vari grafici
+library(patchwork) #per unire grafici e plot
+library(viridis)
+
+setwd("C:/lab/") #setting della working directory
+
+#importiamo l'immagine del ghiacciaio del Similaun
+sen <- brick("sentinel.png")
+sen
+
+#plottiamo l'immagine con la funzione ggRGB, con NIR nella componente red e così via
+ggRGB (sen, 1, 2, 3, stretch="lin")
+#con ggRGB l'argomento stretch si può omettere perchè viene fatto automaticamente, cosa che invece non è possibile con plotRGB
+
+#proviamo a plottare l'immagine mettendo NIR nella componente green
+ggRGB (sen, 2, 1, 3, stretch="lin")
+#questa composizione di bande fa vedere molto bene la roccia in viola, la neve bianca (in grande contrasto), i crepacci si vedono benissimo, praterie verde chiaro e boschi verde scuro
+
+#uniamo questi due grafici
+g1 <- ggRGB (sen, 1, 2, 3, stretch="lin")  #assegnamo il primo plot a una variabile di nome g1 e faciamo lo stesso con il plot 2
+g2 <- ggRGB (sen, 2, 1, 3, stretch="lin")
+g1 + g2
+
+#calcolo della variabilità sul layer NIR
+nir <- sen[[1]] #associamo a nir il primo elemento dell'immagine sen (il primo layer che sappiamo essere NIR in questo caso)
+nir
+plot(nir) #faccio il plot di nir per dare un'occhiata, e vedo già che si vede molta variabilità, almeno a livello visivo
+sd3 <- focal(nir, matrix(1/9, nrow=3, ncol=3), fun=sd)
+
+#colorRampPalette 
+clsd <- colorRampPalette(c("blue", "green", "pink", "magenta", "orange", "brown", "red", "yellow"))(100)
+
+#facciamo un plot dell'immagine sd usando questa colorRampPalette 
+plot(sd3, col=clsd)
+#il plot ottenuto mostra la variabilità del sistema
+#nell'immagine vediamo zone a bassa variabilità (in blu), verosimilmente sono zone con la roccia più compatta (senza crepacci), acqua e neve (molto omogenea, con poche differenze fra un px e l'altro)
+#altre zone sono invece ad altissima variabilità (in giallo-rosso-rosa), ad esempio i bordi dei boschi o i crepacci (differenza netta fra roccia e ombra)
+
+#usiamo ora il pacchetto viridis per plottare con ggplot
+#da installare con install.packages("viridis")
+#per cominciare facciamo un ggplot dell'immagine
+#il ggplot del singolo raster è più complesso del ggRGB, perchè la funzione ggplot apre solo un plot vuoto
+#combiniamo quindi la funzione ggplot alla funzione geom_raster (in cui la geometria dell'immagine è costituita da un insieme di quadrati/rettangoli, cioè px)
+ggplot() + 
+geom_raster(sd3, mapping = aes(x=x, y=y, fill=layer))
+#viene prodotta un'immagine molto bella e informativa, in cui i crepacci si vedono benissimo e sono molto chiari, così come le zone di variazione fra il bosco e prateria ecc
+#questa è la colorazione generale
+
+#ora vediamo altre colorazioni.
+#il pacchetto viridis infatti permette di realizzare plot con legende visibili anche da daltonici e persone color-blind
+#esistono tante legende, usiamo in questo caso la legenda di default "viridis" usando la funzione scale_fill_viridis
+ggplot() + 
+geom_raster(sd3, mapping = aes(x=x, y=y, fill=layer)) + 
+scale_fill_viridis() #cambiamo la legenda: qui, poichè non viene specificato niente, mette quella di default, e cioè viridis
+ggtitle("Standard Deviation by viridis")
+
+#per cambiare la legenda (e sceglierne un'altra che non sia viridis), qui ad esempio usiamo cividis
+ggplot() + 
+geom_raster(sd3, mapping = aes(x=x, y=y, fill=layer)) + 
+scale_fill_viridis(option="cividis") #scegliamo di usare la legenda cividis
+ggtitle("Standard Deviation by viridis")
+
+#usiamo la legenda magma
+ggplot() + 
+geom_raster(sd3, mapping = aes(x=x, y=y, fill=layer)) + 
+scale_fill_viridis(option="magma") #scegliamo di usare la legenda magma
+ggtitle("Standard Deviation by viridis")
+#a differenza di cividis e viridis, che mostrano molto bene i due estremi di variabilità (massima e minima, con due colori principalmente), magma permette di vedere anche situazioni intermedie di variabilità
+
+#proviamo a fare lo stesso usando una finestra mobile di 7x7 invece di 3x3
+sd7 <- focal(nir, matrix(1/49, 7, 7), fun=sd)
 
