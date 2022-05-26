@@ -97,9 +97,20 @@ scale_fill_viridis(option="inferno")
 im1 + im2 + im3
 
 #calcoliamo l'eterogeneità su una moving window 5x5
+sd5 <- focal(pc1, matrix(1/25, 5, 5), fun=sd)
+sd5
 
+#plottiamo insieme la SD della PC1 calcolata con una matrice 3x3 e con una 5x5, entrambe con la legenda inferno
+im4 <- ggplot() + 
+geom_raster(sd5, mapping=aes(x=x, y=y, fill=layer)) + 
+scale_fill_viridis(option="inferno")
+im3 + im4
+#la SD calcolata sulla 5x5 evidenzia maggiormente la variabilità, perchè la variabilità aumenta all'aumentare della finestra di calcolo (moving window)
 
-
-
-
-
+#calcoliamo la SD della PC1 con una finestra 7x7 e plottiamolo con le altre SD calcolate con altre finestre (3x3 e 5x5)
+sd7 <- focal(pc1, matrix(1/49, 7, 7), fun=sd)
+sd7
+im5 <- ggplot() + 
+geom_raster(sd7, mapping=aes(x=x, y=y, fill=layer)) + 
+scale_fill_viridis(option="inferno")
+im3 + im4 + im5
