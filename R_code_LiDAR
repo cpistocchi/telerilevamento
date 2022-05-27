@@ -5,6 +5,7 @@ library(raster)
 library(ggplot2)
 library(viridis)
 library(RStoolbox)
+library(lidR) #per vedere la point cloud
 
 setwd("C:/lab/")
 
@@ -47,7 +48,27 @@ scale_fill_viridis() +
 ggtitle("CHM 2004 San Genesio/Jenesien")
 
 #confrontiamo i due chm per vedere cosa è cambiato in 10 anni, sottraendo chm 2014 e chm 2004
-difference <- chm_2014 + chm_2004
+difference <- chm_2014 - chm_2004
 #errore: i due hanno diversa risoluzione
-#è necessario un ricampionamento, e scegliamo di abbassare la risoluzione dell'immagine più accurata
+#è necessario un ricampionamento (resample), e scegliamo di abbassare la risoluzione dell'immagine più accurata
 #(è sempre preferibile ottenere una risoluzione più grossolana da dati più puntuali e non viceversa)
+chm_2014_r <- resample(chm_2014, chm_2004) 
+chm_2014_r 
+#vediamo che la risoluzione ora è 2.5x2.5
+
+difference <- chm_2014_r - chm_2004 #ora funziona!
+
+#plottiamo difference con ggplot
+ggplot() + 
+geom_raster(difference, mapping=aes(x=x, y=y, fill=layer)) +
+scale_fill_viridis() +
+ggtitle("Difference in CHM")
+#le aree blu scure sono aree in cui i valori sono negativi, quindi probabilmente c'è stato un taglio del bosco
+#le aree più chiare invece c'è stato un aumento in altezza.
+#però la maggior parte della mappa è di colore verde, per cui non ci sono stati cambiamenti di CHM fra le due rilevazioni (probabilmete sono prati)
+#sembra che si siano stati lievi cambiamenti anche nella zona con le case ma questo probabilmente è dovuto all'approssimazione del resampling (che calcola una media fra i px che sono stati "fusi" fra loro nel resampling)
+
+#vediamo la point cloud
+point_cloud <- readLAS("C:/lab/dati/point_cloud.laz")
+plot(point_cloud) #per vedere il 3D di tutta l'area, e zoomando si devono le case, gli alberi ecc
+
