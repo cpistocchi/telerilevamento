@@ -126,6 +126,9 @@ plot(elev, col=cl)
 plot(temp, col=cl)
 plot(prec, col=cl)
 plot(vege, col=cl)
-    
+#oppure creo uno stack aggiungendo a quello fatto precedentemente con i predittori il file raster con la previsione
+final <- stack(preds, p1)
+plot(final, col=cl)
+#codice più velove da scrivere e in più compaiono i nomi associati ai plot
     
     
