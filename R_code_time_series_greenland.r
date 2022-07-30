@@ -1,11 +1,12 @@
-#time series analysis of Greenland LST data
-#carichiamo i pacchetti
+#TIME SERIES ANALYSIS of Greenland LST data
+
+#caricamento pacchetti
 library(raster)
 #settaggio della cartella di lavoro
 setwd("C:/lab/greenland")
 
 #vogliamo caricare insieme 4 dati diversi: LST del 2000, del 2005, del 2010 e del 2015.
-#adesso importiamoli singolarmente usando la funzione raster, che permette di crare un oggetto RasterLayer, un singolo raster, un singolo layer.
+#ora li importiamo singolarmente usando la funzione raster, che permette di creare un oggetto RasterLayer (un singolo raster, un singolo layer)
 lst2000 <- raster("lst_2000.tif")
 #vediamone le informazioni
 lst2000
@@ -15,12 +16,12 @@ lst2000
 #values: 0, 65535 (min, max), cioè è un'immagine a 16 bit (2^16=65536)
 plot(lst2000) #plot dell'immagine del 2000
 #le T più basse sono nelle zone in giallo 
-#importiamo gli altri dati
+#importazione degli altri dati
 lst2005 <- raster("lst_2005.tif")
 lst2010 <- raster("lst_2010.tif")
 lst2015 <- raster("lst_2015.tif")
 
-#creiamo una color ramp palette
+#creiamo una colorRampPalette
 cl <- colorRampPalette(c("blue", "light blue", "pink", "red"))(100)
 
 #multiframe dei dati della Groenlandia
@@ -40,17 +41,19 @@ rlist #vediamo quali oggetti sono stati inseriti nella lista
 import <- lapply(rlist, raster)
 import
 #ci sono 4 elementi, indicati con le doppie parentesi quadre [[ ]]
-#possiamo decidere di voler fare uno stack, cioè combinarli insieme in un'unica immagine, come se fossero più layer di un'unica immagine (come accade per le immagini satellitari)
-#usiamo la funzione stack
+
+#creazione di uno stack, cioè si combinano insieme in un'unica immagine, come se fossero più layer di un'unica immagine (come accade per le immagini satellitari)
+#uso della funzione stack
 tgr <- stack(import)
 tgr 
 #class: RasterStack (è come un RasterBrick, creato in modo diverso)
 #tutte le altre informazioni sono come per le immagini satellitari, quindi con le dimensioni, il numero di layers ecc
-#ora non serve fare un multiframe, ma per vedere gli elementi di tgr posso fare
-plot(tgr, col=cl) #e in più mette i nomi, cosa che nel multiframe non accadeva
+#ora non serve fare un multiframe, ma per vedere gli elementi di tgr:
+plot(tgr, col=cl) #sono specificati i nomi, cosa che nel multiframe non accadeva
+
 #per plottare solo un layer specifico l'elemento
 plot(tgr[[1]], col=cl)
-#possiamo anche fare un RGB basandosi sui layer dello stack creato, ad esempio:
+#creazione di un RGB basandosi sui layer dello stack creato, ad esempio:
 #red= lst 2000
 #green= lst 2005
 #blue= lst 2010
