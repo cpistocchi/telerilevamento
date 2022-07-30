@@ -1,4 +1,5 @@
 #INDICI SPETTRALI/INDICI DI VEGETAZIONE
+
 #sono necessarie:
 library(raster)
 library(RStoolbox) #libreria sviluppata per elaborare dati spettrali)
@@ -6,45 +7,46 @@ library(RStoolbox) #libreria sviluppata per elaborare dati spettrali)
 #settaggio della working directory
 setwd("C:/lab/")
 
-#come dati usiamo due time frame (agosto 2006 e luglio 1992) riferiti al Rio Peixoto ottenute dall'Earth Observatory della NASA
+#come dati i utilizzerano due time frame (agosto 2006 e luglio 1992) riferiti al Rio Peixoto ottenute dall'Earth Observatory della NASA
 #nella cartella lab sono chiamati defor_1 e defor_2
-#importiamo il primo file defor_1 assegnandolo a un oggetto chiamato l1992
+#importazione del primo file defor_1 assegnandolo a un oggetto chiamato l1992
 l1992 <- brick("defor1_.jpg")
 #nell'esecuzione vi è un errore perchè è richiesta l'installazione del pacchetto rgdal. 
 #rgdal è una libreria che è riferita a gdal (Geospatial Data Abstraction Library)
 install.packages("rgdal")
 library(rgdal)
-l1992 <- brick("defor1_.jpg") #ora funziona
-#vediamo le informazioni di questa immagine
+l1992 <- brick("defor1_.jpg") #ora funziona!
+
+#le informazioni di questa immagine del 1992:
 l1992
-#class : RasterBrick, significa che è un'immagine con tanti livelli
+#class : RasterBric (è un'immagine con tanti livelli)
 #dimensions : sono presenti 3 sole bande (nlayers, l'ultimo argomento)
-#resolution: la risoluzione in questo caso è una risoluzione immagine, non è un'immagine georeferenziata, proprio perchè scaricata direttamente dall'Erath Observatory della NASA
-#names: defor1_.1, defor1_.2, defor1_.3 (sono i nomi dei layer dell'immagine)
+#resolution: la risoluzione in questo caso è una risoluzione immagine, non è un'immagine georeferenziata, proprio perchè scaricata direttamente dall'Earth Observatory della NASA
+#names: defor1_.1, defor1_.2, defor1_.3 (i nomi dei layer dell'immagine)
 #min values: 0, 0, 0
 #max values: 255, 255, 255
-#i valori vanno da 0 a 255! nel codice precedente invece andavano da 0 a 1 i valori di riflettanza.
-#questo avviene perchè l'immagine è a 8 bit
+#i valori vanno da 0 a 255! nel codice precedente (R_code_rs) invece i valori di riflettanza andavano da 0 a 1.
+#questo avviene perchè l'immagine è a 8 bit (valori da 0--> 255)
 
 #non conosciamo a quale banda corrisponde ogni layer quindi cerchiamo di capirlo facendo qualche plot usando lo schema RGB
 plotRGB(l1992, r=1, g=2, b=3, stretch="lin") #proviamo associando le bande 1 a red, 2 a green e 3 a blue
 #in base all'immagine prodotta (molto rossa) vogliamo capire quale è la banda che ha portato la vegetazione a sembrare rossa.
 #poiché l'immagine è molto rossa in corrispondenza delle zone con vegetazione, la bande 1 che abbiamo assegnato a red è l'IR
 #in questa immagine, la banda numero 1 è NIR (associata a r)
-#poichè solitamente le bande si montano in sequenza, teoricamente in questa immagine
+#poichè solitamente le bande si montano in sequenza, teoricamente in questa immagine:
 #la banda 2 è il rosso (associato a g)
 #la banda 3 è il verde (associato a b)
 
 #facciamo lo stesso per la seconda immagine
-#importa il seconda file defor2_ e assegnalo a un oggetto di nome l2006
-l2006 <- brick("defor2_.jpg") #ora funziona
-#vediamo le informazioni di questa immagine
+#importazione del secondo file defor2_ e assegnazione a un oggetto di nome l2006
+l2006 <- brick("defor2_.jpg")
+#le informazioni di questa immagine
 l2006
-#plottiamola con schema RGB
+#plot dell'immagine con schema RGB
 plotRGB(l2006, r=1, g=2, b=3, stretch="lin")
-#le zone rosse sono molto minori, e quindi la vegetazione è stata eliminata molto in questa zona per far spazio alle attività umane come l'agricoltura ecc
+#le zone rosse sono molto minori, e quindi la vegetazione è stata eliminata molto in questa zona per far spazio alle attività umane come l'agricoltura ecc.
 
-#plottiamo in un multiframe le due immagini, una sopra all'altra
+#plot in un multiframe delle due immagini, una sopra all'altra
 par(mfrow = c(2, 1))
 plotRGB(l1992, r=1, g=2, b=3, stretch="lin")
 plotRGB(l2006, r=1, g=2, b=3, stretch="lin")
@@ -56,37 +58,38 @@ plotRGB(l2006, r=1, g=2, b=3, stretch="lin")
 #nel terreno rimasto inalterato nel tempo come forma
 
 #DVI Difference Vegetation Index
-#lo usiamo per calcolare la salute della vegetazione di questa zona nel 1992 e nel 2006
+#useremo il DVI per calcolare la salute della vegetazione di questa zona nel 1992 e nel 2006
 #DVI è la differenza fra riflettanze: NIR - red
-#lo calcolo usando gli elementi, con le [[ ]]
-dvi1992 = l1992[[1]] - l1992[[2]] #oppure uso <-
-#oppure posso calcolarlo così, con i nomi delle bande: dvi1992 = l1992$defor1_.1 - l1992$defor1_.2
+#viene calcolato usando specificando gli elementi (le bande), con le [[ ]]
+dvi1992 = l1992[[1]] - l1992[[2]] #oppure uso <- invece di =
+#oppure si può calcolare così, con i nomi delle bande: dvi1992 = l1992$defor1_.1 - l1992$defor1_.2
 dvi1992
-# valori minimi e max di DVI nell'immagine sono -114 e 248.
-#per visualizzare il DVI ottenuto uso una colorRampPalette personalizzata
+#valori minimi e max di DVI nell'immagine sono -114 e 248.
+#uso di una colorRampPalette personalizzata per visualizzare il DVI ottenuto
 cl <- colorRampPalette(c("darkblue", "yellow", "red", "black"))(100)
 plot(dvi1992, col=cl)
 #ciò che nell'immagine è rosso scuro è vegetazione in salute
 #ciò che è giallo è vegetazione non in salute (fatta eccezione per il fiume, che è giallo ma non è vegetazione)
 
-#facciamo lo stesso per il 2006
+#calcolo del DVI per l'immagine del 2006
 dvi2006 = l2006[[1]] - l2006[[2]] 
 dvi2006
 plot(dvi2006, col=cl)
 #in questa immagine le zone gialle sono tantissime: c'è stata tantissima deforestazione e si vede molto bene la differenza rispetto al 1992
 #la foresta è molto frammentata: per degradare un habitat non è necessario distruggerlo del tutto, ma generare frammentazione fra popolazioni
 #(che porta a un maggior rischio di estinzione della popolazione o della specie)
-#in questa zona si stanno estinguendo i colubi rossi, primati a rischio per degrado del loro habitat
+#in questa zona si stanno estinguendo i colobi rossi, primati a rischio per degrado del loro habitat
 #scelta dei colori: il giallo è uno dei colori che colpisce di più la retina, quindi si vede subito e porta l'attenzione sugli elementi di quel colore
 
-#per comparare il DVI di un px dell'immagine fra il 1992 e il 2006 (se è avvenuta deforestazione si assiste a una diminuzione del DVI in quel punto), facciamo la differenza fra i DVI
+#per comparare il DVI di un px dell'immagine fra il 1992 e il 2006 (se è avvenuta deforestazione si assiste a una diminuzione del DVI in quel punto), 
+#si calcola la differenza fra i DVI delle due immagini
 dvi_dif = dvi1992 - dvi2006
 cld <- colorRampPalette(c("blue", "white", "red"))(100)
 plot(dvi_dif, col=cld)
 #in questa immagine, dove si ha una differenza positiva si hanno valori rossi (e quindi è avvenuta deforestazione, perchè DVI nel 1992 è maggiore del DVI del 2006 e la differenza è positiva)
 #le zone molto rosse sono quelle colpite da una fortissima deforestazione
 
-#la funzione spectralIndices è una funzione del pacchetto RStoolbox, che serve per calcolare tutti gli indici insieme
+#la funzione spectralIndices è una funzione del pacchetto RStoolbox, che serve per calcolare tutti gli indici insieme (vedi dopo)
 
 #range DVI (8 bit) = -256 / +256
 #range NDVI (8 biy) = -1 / +1
@@ -95,21 +98,22 @@ plot(dvi_dif, col=cld)
 #range NDVI (16 bit) = -1 / +1
 #quindi NDVI può essere usato anche per confrontare immagini con risoluzione radiometrica differente
 
-#calcoliamo l'NDVI (se lo fai in una nuova sessione di R devi caricare la libreria raster)
+#calcolo dell'NDVI (facendolo in una nuova sessione di R devi caricare la libreria raster)
 library(raster)
 setwd("C:/lab/")
-#carichiamo le immagini del 1992 e del 2006
+#caricamento delle immagini del 1992 e del 2006
 l1992 <- brick("defor1_.jpg") 
 l1992
 l2006 <- brick("defor2_.jpg")
 l2006
 #le immagini sono a 8 bit perchè i valori min e max sono 0-->255, quindi ci sono 256 valori
 #in questo caso, poichè entrambe sono a 8 bit, potrebbe bastare anche il DVI, ma facciamo comunque l'NDVI
+
 dvi1992 = l1992[[1]] - l1992[[2]] #DVI 1992
 ndvi1992 = dvi1992 / (l1992[[1]] + l1992[[2]]) #oppure 
 ndvi1992 = (l1992[[1]] - l1992[[2]]) / (l1992[[1]] + l1992[[2]])
 ndvi1992 #vediamo le caratteristiche
-#si nota che i valori vanno da -1 --> +1
+#i valori vanno da -1 --> +1
 #facciamo un plot dell'NDVI 1992
 cl <- colorRampPalette(c("darkblue", "yellow", "red", "black"))(100)
 plot(ndvi1992, col=cl)
@@ -127,7 +131,7 @@ ndvi2006 = dvi2006 / (l2006[[1]] + l2006[[2]]) #NDVI 2006
 par(mfrow = c(2, 1))
 plot(ndvi1992, col=cl)
 plot(ndvi2006, col=cl)
-#si nota che nel tempo, avendo aperto così tante aree agricole a danno della foresta vergine, le riflettanze sono cambiante e quindi gli NDVI sono diversi
+#si nota che nel tempo, avendo aperto così tante aree agricole a danno della foresta vergine, le riflettanze sono cambiate e quindi gli NDVI sono diversi
 
 #AUTOMATIC SPECTRAL INDICES
 #esiste un modo per calcolare tutto automaticamente
@@ -136,10 +140,12 @@ plot(ndvi2006, col=cl)
 #come l'NDVI, SAVI (Soil Adjust Vegetation Index, che pesa la riflettanza del suolo) e altri
 #lavora con varie bande: blu, verde, rosso, NIR, redEdge (differenza fra rosso e infrarosso), swir (infrarosso medio, "short wave infrared")
 #lo usiamo per calcolare gli indici che coinvolgono le bande del rosso e del NIR, e al massimo quella del verde.
-#installiamo il pacchetto RStoolbox
+
+#installazione del pacchetto RStoolbox
 install.packages("RStoolbox")
-library(RStoolbox) #carichiamo il pacchetto, che abbiamo già installato
-#facciamo gli spectral indices del 1992
+library(RStoolbox) #caricamento del pacchetto
+
+#spectral indices del 1992
 si1992 <- spectralIndices(l1992, green=3, red=2, nir=1)
 #abbiamo associato alle componenti green, red e NIR i layer corrispondenti, che ricordiamo essere:
 #layer 3: verde
@@ -148,7 +154,8 @@ si1992 <- spectralIndices(l1992, green=3, red=2, nir=1)
 #la funzione calcolerà tutti gli indici possibili che sfruttano queste 3 bande
 plot(si1992, col=cl) #in output sono mostrati tutti gli indici possibili calcolati con le 3 bande
 #NDWI è un indice che considera la quantità di acqua all'interno di ogni singolo pixel
-#facciamo gli spectral indices per il 2006
+
+#spectral indices per il 2006
 si2006 <- spectralIndices(l2006, green=3, red=2, nir=1)
 plot(si2006, col=cl)
 
@@ -157,6 +164,7 @@ plot(si2006, col=cl)
 #il pacchetto è rasterdiv (Diversity Indices for Numerical Matrices, si chiama così perchè calcola la diversità basata sui dati raster partendo dall'ecologia di comunità) 
 #e permette di misurare la diversità dallo spazio
 #"l'ecologia di comunità è una branca dell'ecologia che misura la diversità all'interno delle comunità, cioè di gruppi di organismi di specie diverse che convivono insieme
+
 install.packages("rasterdiv")
 library(rasterdiv)
 plot(copNDVI) #è l'NDVI di Copernicus. è un raster a 8 bit (valori 0-->255), e l'NDVI è calcolato in modo che sia la media globale degli NDVI calcolati dal 1999 al 2017
