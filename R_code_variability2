@@ -1,11 +1,13 @@
 #MISURE DI VARIABILITà E ANALISI MULTIVARIATA
+
+#librerie
 library(raster) #per gestire dati sotto forma di matrici (es immagini)
 library(RStoolbox) #funzioni dedicate al telerilevamento
 library(ggplot2)
 library(patchwork)
 library(viridis)
 
-setwd("C:/lab/")
+setwd("C:/lab/") #setting working directory
 
 #importiamo l'immagine
 sen <- brick("sentinel.png")
@@ -15,10 +17,10 @@ sen
 #banda 2: red
 #banda 3: green
 
-#visualizziamo l'immagine con la funzione ggRGB di ggplot2 (con questa funzione lo stretch viene già fatto in automatico)
+#visualizzazione dell'immagine con la funzione ggRGB di ggplot2 (con questa funzione lo stretch viene già fatto in automatico)
 ggRGB(sen, r=1, g=2, b=3)
 
-#visualizza l'immagine in modo che la vegetazione diventi verde fluorescente (e il suolo nudo viola)
+#visualizzazione dell'immagine in modo che la vegetazione diventi verde fluorescente (e il suolo nudo viola)
 ggRGB(sen, 2, 1, 3)
 
 #per poter calcolare la variabilità, è necessario lavorare su un solo layer.
@@ -27,20 +29,20 @@ ggRGB(sen, 2, 1, 3)
 sen_PCA <- rasterPCA(sen)
 sen_PCA
 
-#facciamo ora un summary del modello, al fine di capire quanta variabilità del modello è spiegata da PC1.
+#summary del modello, al fine di capire quanta variabilità del modello è spiegata da PC1.
 summary(sen_PCA$model)
 #"importance of components" significa: quanto spiega della variabilità ogni singolo componente?
 #(leggi alla voce "Proportion og variance")
 #la prima componente spiega il 67.37%
 #la seconda spiega il 32.25%
 #la terza spiega il 0.37%
-#(alla voce "cumulative proportion" è indicata la cumulativa dei valori sopra:
+#alla voce "cumulative proportion" è indicata la cumulativa dei valori sopra:
 #la componente 1 spiega il 67.37%
 #la componente 1+2 spiega il 99.63% (67.37+32.25%), quindi bastano due bande per spiegare il 99,63% della variabilità.
 la componente 1+2+3 spiega il 100% della variabilità.
 #poichè la variabilità verrà calcolata su una sola componente, usiamo la prima (che spiega circa il 67%, che non è il max ma è comunque informativa)
 
-#plottiamo:
+#plot
 plot(sen_PCA$map)
 #si vedono i 4 plot (3 informativi e il quarto di controllo).
 #la prima componente PC1 spiega gran parte della variabilità, la seconda una parte minore (gli oggetti si vedono in modo molto meno discriminato), la terza fornisce pochissime informazioni
@@ -49,32 +51,33 @@ pc1 <- sen_PCA$map$PC1
 pc2 <- sen_PCA$map$PC2
 pc3 <- sen_PCA$map$PC3
 
-#usando ggplot facciamo dei plot più chiari, qui plottiamo la PC1
+#usando ggplot si costruiscono dei plot più chiari. plot di PC1
 g1 <- ggplot() +
 geom_raster(pc1, mapping=aes(x=x, y=y, fill=PC1))
-#abbiamo aperto un ggplot vuoto e gli abbiamo associato una geometria di natura raster in cui plottiamo la priuma componente della PCA (che si chiama PC1)
+#è stato aperto un ggplot vuoto e gli viene associata una geometria di natura raster in cui è plottata la prima componente della PCA (che si chiama PC1)
 
-#ora facciamo gli stessi plot con le altre componenti PC2 e PC3
+#plot con le altre componenti PC2 e PC3
 g2 <- ggplot() +
 geom_raster(pc2, mapping=aes(x=x, y=y, fill=PC2))
 g3 <- ggplot() +
 geom_raster(pc3, mapping=aes(x=x, y=y, fill=PC3))
 
-#ora plottiamo le 3 componenti una accanto all'altra usando il pacchetto patchwork
+#plot delle 3 componenti una accanto all'altra usando il pacchetto patchwork
 g1 + g2 + g3
 
-#ora facciamo il calcolo della variabilità su una delle componenti, scegliendo quella che spiega la maggior parte della variabilità iniziale del sistema
-#applichiamo il calcolo della deviazione standard alla PC1, con la funzione focal (che sfrutta la moving window)
+#calcolo della variabilità su una delle componenti, scegliendo quella che spiega la maggior parte della variabilità iniziale del sistema
+#applicazione del calcolo della deviazione standard alla PC1, con la funzione focal (che sfrutta la moving window)
 sd3 <- focal(pc1, matrix(1/9, 3, 3), fun=sd)
 sd3
-#è un RasterLayer, che quindi possiamo a sua volta plottare con ggplot. 
+#è un RasterLayer, che quindi è possibile a sua volta plottare con ggplot. 
 
 #mappa con ggplot la deviazione standard della PC1
 ggplot() + 
 geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer))
-#per capire cosa scrivere in "fill" vado a leggere cosa c'è scritto alla voce "names" chiamando sd3. in questo caso c'è scritto "layer".
+#per capire cosa scrivere in "fill", leggo cosa c'è scritto alla voce "names" chiamando sd3. in questo caso c'è scritto "layer".
 #è molto ben visibile la differenziazione che c'è in tutti i vari crepacci del suolo nudo. invece non viene molto evidenziata la differenziazione della vegetazione.
-#per evidenziare quest'ultimo aspetto possiamo lavorare sui colori usando il pacchetto viridis. usiamo la legenda viridis
+
+#per evidenziare quest'ultimo aspetto è possibile lavorare sui colori usando il pacchetto viridis. Uso della legenda viridis
 ggplot() + 
 geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer)) + 
 scale_fill_viridis() #compare il giallo, che è il primo colore che colpisce la retina e quindi rende tutto più visibile
@@ -86,9 +89,9 @@ scale_fill_viridis(option="cividis") #cividis attenua i toni di colorazione scur
 ggplot() + 
 geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer)) + 
 scale_fill_viridis(option="inferno")
-#con queste legende facciamo emergere visivamente le zone della mappa, dell'immagine, con maggiore eterogeneità/variabilità/diversità
+#con queste legende sono fatte emergere visivamente le zone della mappa, dell'immagine, con maggiore eterogeneità/variabilità/diversità
 
-#plottiamo insieme le varie immagini: immagine originale, la PC1 su cui abbiamo fatto il calcolo della sd, e la SD della PC1 con la legenda inferno di viridis
+#plot delle varie immagini insieme: immagine originale, la PC1 su cui abbiamo fatto il calcolo della sd, e la SD della PC1 con la legenda inferno di viridis
 im1 <- ggRGB(sen, 2, 1, 3)
 im2 <- g1
 im3 <- ggplot() + 
@@ -96,7 +99,7 @@ geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer)) +
 scale_fill_viridis(option="inferno")
 im1 + im2 + im3
 
-#calcoliamo l'eterogeneità su una moving window 5x5
+#calcolo dell'eterogeneità su una moving window 5x5
 sd5 <- focal(pc1, matrix(1/25, 5, 5), fun=sd)
 sd5
 
@@ -107,7 +110,7 @@ scale_fill_viridis(option="inferno")
 im3 + im4
 #la SD calcolata sulla 5x5 evidenzia maggiormente la variabilità, perchè la variabilità aumenta all'aumentare della finestra di calcolo (moving window)
 
-#calcoliamo la SD della PC1 con una finestra 7x7 e plottiamolo con le altre SD calcolate con altre finestre (3x3 e 5x5)
+#calcolo della SD della PC1 con una finestra 7x7 e lo plottiamo con le altre SD calcolate con altre finestre (3x3 e 5x5)
 sd7 <- focal(pc1, matrix(1/49, 7, 7), fun=sd)
 sd7
 im5 <- ggplot() + 
