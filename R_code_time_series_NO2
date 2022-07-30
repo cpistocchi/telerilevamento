@@ -1,24 +1,27 @@
-#diminuzione NO2 nel periodo di lockdown in Europa
+#TIME SERIES ANALYSIS: diminuzione NO2 nel periodo di lockdown in Europa
 
+#librerie
 library(raster)
 
+#set working directory
 setwd("C:/lab/en")
 
+#importazione immagini:
 en01 <- raster("EN_0001.png")
-cl <- colorRampPalette(c('red','orange','yellow'))(100) #
-plot(en01, col=cl)
+cl <- colorRampPalette(c('red','orange','yellow'))(100) #creazione palette personalizzata
+plot(en01, col=cl) #plot immagine con la palette personalizzata
 en13 <- raster("EN_0013.png")
 plot(en13, col=cl)
 
-#importiamo tutti i dati (da gennaio a marzo)
-rlist <- list.files(pattern="EN") #facciamo una lista di tutti i file che vogliamo incorporare (qui tutti hanno "EN" nel nome)
+#importazione di tutti i dati (da gennaio a marzo)
+rlist <- list.files(pattern="EN") #lista di tutti i file che vogliamo incorporare (qui tutti hanno "EN" nel nome)
 rimp <- lapply(rlist, raster) #applichiamo alla lista rlist la funzione raster (cioè l'importazione)
-en <- stack(rimp)
+en <- stack(rimp) 
 
 #plottiamo il tutto
 plot(en, col=cl)
 
-#ora plottiamo vicine fra loro EN01 ed EN13
+#plottiamo vicine fra loro EN01 ed EN13
 par(mfrow=c(1,2))
 plot(en[[1]], col=cl)
 plot(en[[13]], col=cl)
@@ -31,7 +34,7 @@ difen <- en[[1]] - en[[13]]
 cldif <- colorRampPalette(c('blue','white','red'))(100) #
 plot(difen, col=cldif)
 
-#facciamo un plotRGB con tutti i dati
+#plotRGB con tutti i dati
 plotRGB(en, r=1, g=7, b=13, stretch="lin")
 #in cui
 #rosso: gennaio
