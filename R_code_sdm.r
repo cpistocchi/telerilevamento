@@ -1,4 +1,4 @@
-# CODICE IN R SUI MODELLI DI DISTRIBUZIONE DI SPECIE
+#MODELLI DI DISTRIBUZIONE DI SPECIE
 
 library(sdm) #per modellizzare la distribuzione delle specie
 library(raster) #per gestire dati geografici, spaziali, sotto forma di matrice
