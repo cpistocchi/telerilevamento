@@ -1,8 +1,12 @@
-#vediamo se riusciamo a discriminare diversi tipi mineralogici della stessa roccia
+#CLASSIFICAZIONE (Grand Canyon): discriminazioni di diversi tipi mineralogici nella stessa roccia
+
+#librerie
 library(raster)
 library(RStoolbox)
 
-setwd("C:/lab/")
+setwd("C:/lab/") #setting working directory
+
+#importazione dato
 gc <- brick("dolansprings_oli_2013088_canyon_lrg.jpg")
 gc
 #l'immagine è a 8 bit perchè i valori min e max sono 0->255
@@ -11,26 +15,27 @@ gc
 #verde = 2
 #blu = 3
 
+#plot RGB dell'immagine (stretch lineare)
 plotRGB(gc, r=1, g=2, b=3, stretch="lin")
 #si vede l'immagine come lo si vedrebbe nel visibile, e si vedono differenze fra le rocce, acqua, nuvole e le loro ombre
 
-#cambia lo stretch da lin a hist
-plotRGB(gc, r=1, g=2, b=3, stretch="hist") #per far risaltare il contrasto dell'immagine
+#plot RGB dell'immagine (stretch lineare)
+plotRGB(gc, r=1, g=2, b=3, stretch="hist") #risalta il contrasto dell'immagine
 
-#creiamo le classi.
-#alla funzione va data l'immagine da classificare, il numero di classi e, in caso, il numero di px campione - di default è 10000)
+#creazione delle classi.
+#alla funzione vanno specifiati negli argomenti: l'immagine da classificare, il numero di classi e, in caso, il numero di px campione (di default è 10000)
 gcclass2 <- unsuperClass (gc, nClasses=2)
 gcclass2
 #ha solo 2 valori, 1 e 2, perchè abbiamo stabilito 2 classi
 
-#facciamo un plot
+#plot dell'immagine in classi
 plot(gcclass2$map)
 #la classe verde (1) corrisponde alle rocce
-#la classe bianca (2) corrisponde all'acqua e alle ombre o da una particolare differenziazione nelle rocce
-#se in futuro rifacessimo la classificazione, è possibile che il risultato sia un po' diverso perchè i px presi come campione potrebbero essere variabili
+#la classe bianca (2) corrisponde all'acqua e alle ombre o a una particolare differenziazione nelle rocce
+#se in futuro si rifacesse la classificazione, è possibile che il risultato sia un po' diverso perchè i px presi come campione potrebbero essere variabili
 #per mantenere costanti i px campione si usa la funzione set.seed(17) (qui 17 è un esempio)
 
-#ora consideriamo un numero magiore di classi (es 4)
+#si considera un numero magiore di classi (es 4)
 gcclass4 <- unsuperClass (gc, nClasses=4)
 plot(gcclass4$map)
 
@@ -41,7 +46,7 @@ plot(gcclass4$map, col=clc)
 #un'altra classe comprende l'acqua e le ombre (che assorbono la radiazione luminosa)
 #una terza e quarta classe rappresenta una determinata composizione mineralogica
 
-#sovrapponiamo la rappresentazione in 4 classi a quella in colori reali
+#visualizzazione in un'unica finestra della rappresentazione in 4 classi insieme a quella in colori reali
 par(mfrow=c(2,1))
 plot(gcclass4$map, col=clc)
 plotRGB(gc, r=1, g=2, b=3, stretch="hist")
