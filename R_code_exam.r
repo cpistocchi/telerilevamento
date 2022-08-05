@@ -11,7 +11,6 @@ library(raster)
 library(RStoolbox)
 library(patchwork)
 
-
 #setting della cartella di lavoro:
 setwd("C:/lab/Lake_Chad_Analysis") 
 
@@ -37,7 +36,7 @@ lake13
 
 #plot immagine 2013 (visibile)
 plotRGB(lake13, r=4, g=3, b=2, stretch="lin") #stretch lineare
-plotRGB(lake13, r=4, g=3, b=2, stretch="hist") #stretch istogrammi
+plotRGB(lake13, r=4, g=3, b=2, stretch="hist") #stretch istogrammi, per evidenziare meglio i contrasti
 
 #2022:
 rlist22 <- list.files(pattern="LC08_L2SP_185051_20220405_20220412_02_T1_SR_B") #lista di file (qui bande) relative all'immagine del 2022
