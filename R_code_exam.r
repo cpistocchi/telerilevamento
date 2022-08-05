@@ -63,9 +63,15 @@ plot13 + plot22
 #per questo motivo verranno fatte analisi e considerazioni di carattere qualitativo (e non quantitativo).
 
 #evidenziamo differenza nella copertura vegetale tra il 2013 e il 2022 (aprile: fine periodo secca).
-#NIR nel rosso:
+#NIR nella componente R:
 par(mfrow=c(1,2))
 plotRGB(lake13, r=5, g=4, b=3, stretch="hist")
 plotRGB(lake22, r=5, g=4, b=3, stretch="hist")
-
+#in rosso sono evidenziate le zone con vegetazione
+#per renderlo ancora più evidente,
+#NIR nella componente G, rosso nella R, e verde nella B:
+par(mfrow=c(1,2))
+plotRGB(lake13, r=4, g=5, b=3, stretch="hist")
+plotRGB(lake22, r=4, g=5, b=3, stretch="hist")
+#in verde sono evidenziate le zone con vegetazione, mentre in viola intenso l'acqua del lago, delle pozze e del fiume.
 
