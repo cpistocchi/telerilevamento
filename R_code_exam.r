@@ -7,11 +7,13 @@
 #install.packages("RStoolbox")
 #install.packages("patchwork")
 #install.packages("viridis")
+#install.packages("ggplot2")
 
 library(raster)
 library(RStoolbox)
 library(patchwork)
 library(viridis)
+library(ggplot2)
 
 #setting della cartella di lavoro:
 setwd("C:/lab/Lake_Chad_Analysis") 
@@ -75,6 +77,45 @@ plot(class413$map, col=viridis(4, option="G")) #mako
 plot(class422$map, col=viridis(4, option="G")) #mako
 #con 4 classi sono ben visibili l'acqua, la vegetazione e le zone con suolo nudo (probabilmente a due livelli diversi di umidità del suolo)
 
+#frequenze (numero di px) per ogni classe
+freq(class413$map) #frequenze 4 classi 2013
+#classe 1 (piante): 10064971 px
+#classe 2 (acqua): 3870693 px
+freq(class422$map) #frequenze 4 classi 2022
+#classe 1 (acqua): 4865587 px
+#classe 4 (piante): 10225045 px
+#per capire quanti px totali
+lake13
+tot13 <- 55136451
+lake22
+tot22 <- 59145081
+veg13 <- 10064971/tot13*100 #vegetazione % nel 2013
+veg13
+veg22 <- 10225045/tot22*100 #vegetazione % nel 2022
+veg22
+acq13 <- 3870693/tot13*100 #acqua % nel 2013
+acq13
+acq22 <- 4865587/tot22*100 #acqua % nel 2022
+acq22
+#DATI FINALI
+#% vegetazione 2013: 18.25466%
+#% acqua 2013: 7.020207%
+#% vegetazione 2022: 17.28807%
+#% acqua 2022: 8.226529%
+#DATAFRAME
+classi <- c("Vegetazione%", "Acqua%") #prima colonna
+perc13 <- c(18.25466, 7.020207) #seconda colonna
+perc22 <- c(17.28807, 8.226529) #terza colonna
+multitemporal <- data.frame(classi, perc13, perc22)
+View(multitemporal)
+#BARCHART 2013
+ggplot(multitemporal, aes(x=classi, y=perc13, col=classi))+
+geom_bar(stat="identity", fill="white")
+#BARCHART
+ggplot(multitemporal, aes(x=classi, y=perc22, col=classi))+
+geom_bar(stat="identity", fill="white")
+
+
 #evidenziamo differenza nella copertura vegetale tra il 2013 e il 2022 (aprile: fine periodo secca).
 #NIR nella componente R:
 par(mfrow=c(1,2))
@@ -87,6 +128,7 @@ par(mfrow=c(1,2))
 plotRGB(lake13, r=4, g=5, b=3, stretch="hist")
 plotRGB(lake22, r=4, g=5, b=3, stretch="hist")
 #in verde sono evidenziate le zone con vegetazione, mentre in viola intenso l'acqua del lago, delle pozze e del fiume.
+
 
 #INDICI SPETTRALI
 #Indici di vegetazione: DVI e NDVI
