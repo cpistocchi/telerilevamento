@@ -6,10 +6,12 @@
 #install.packages("raster")
 #install.packages("RStoolbox")
 #install.packages("patchwork")
+#install.packages("viridis")
 
 library(raster)
 library(RStoolbox)
 library(patchwork)
+library(viridis)
 
 #setting della cartella di lavoro:
 setwd("C:/lab/Lake_Chad_Analysis") 
@@ -61,6 +63,17 @@ plot13 + plot22
 
 #le immagini del 2013 e del 2021 sono relative alla stessa zona ma hanno dimensioni leggermente diverse (2013: 55136451 px; 2022: 59145081 px).
 #per questo motivo verranno fatte analisi e considerazioni di carattere qualitativo (e non quantitativo).
+
+#CLASSIFICAZIONE, per comprendere meglio di discriminare le componenti
+#in 4 classi
+class413 <- unsuperClass(lake13, nClasses=4)
+class413
+class422 <- unsuperClass(lake22, nClasses=4)
+class422
+par(mfrow=c(1, 2))
+plot(class413$map, col=viridis(4, option="G")) #mako
+plot(class422$map, col=viridis(4, option="G")) #mako
+#con 4 classi sono ben visibili l'acqua, la vegetazione e le zone con suolo nudo (probabilmente a due livelli diversi di umidità del suolo)
 
 #evidenziamo differenza nella copertura vegetale tra il 2013 e il 2022 (aprile: fine periodo secca).
 #NIR nella componente R:
