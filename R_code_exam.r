@@ -66,6 +66,7 @@ plot13 + plot22
 #le immagini del 2013 e del 2021 sono relative alla stessa zona ma hanno dimensioni leggermente diverse (2013: 55136451 px; 2022: 59145081 px).
 #per questo motivo verranno fatte analisi e considerazioni di carattere qualitativo (e non quantitativo).
 
+
 #CLASSIFICAZIONE, per comprendere meglio di discriminare le componenti
 #in 4 classi
 class413 <- unsuperClass(lake13, nClasses=4)
@@ -204,4 +205,39 @@ plot(ndwi_dif, col=clb) #valori elevati, in rosso, mostrano un aumento dell'acqu
 #le situazioni sono complementari, soprattutto nella parte alta dell'immagine (dove a un aumento della vegetazione corrisponde una diminuzione delle zone sommerse),
 #e nella parte a Nord-Est del lago, dove invece la vegetazione è stata soppiantata dalla presenza dell'acqua.
 
+#MISURE DI ETEROGENEITà: PCA
+#per ottenere la PC1
+pca13 <- rasterPCA(lake13) #2013
+pca22 <- rasterPCA(lake22) #2022
+pca13
+pca22
+summary(pca13$model) #la PC1 (2013) spiega il 93.2% della variabilità del sistema
+summary(pca22$model) #la PC1 (2022) spiega il 94.5% della variabilità del sistema
+#la PC1 è quindi in grado di rappresentare, in un singolo layer, la maggior parte della variabilità del sistema. 
+#verrà quindi impiegata per misurare la variabilità del sistema.
+#plottando tutte le componenti, si evidenzia come la PC1 anche graficamente mostri meglio la variabilità, discriminando meglio le componenti:
+plot(pca13$map)
+plot(pca22$map)
+#si associa ciascuna PC1 a un oggetto, per facilitare i passaggi successivi
+pc1_13 <- pca13$map$PC1
+pc1_22 <- pca22$map$PC1
+#plot della PC1 per il 2013 (dx) e per il 2022 (sx), con legenda plasma
+par(mfrow=c(1,2))
+plot(pc1_13, col=viridis(200, option="C"))
+plot(pc1_22, col=viridis(200, option="C")) 
+#la variabilità è ben evidenziata da entrambi i plot, specialmente da quello del 2022
+#calcolo della variabilità su PC1 (tale calcolo è possibile effettuarlo su un solo layer)
+sdpc1_13 <- focal(pc1_13, matrix(1/9, 3, 3), fun=sd)
+sdpc1_13
+plot(sdpc1_13, col=viridis(200, option="B"))
+sdpc1_22 <- focal(pc1_22, matrix(1/9, 3, 3), fun=sd) 
+sdpc1_22
+plot(sdpc1_22, col=viridis(200, option="B"))
+#la moving window è molto piccola (3x3) e la variabilità non è ben evidenziata in questo modo, quindi si ricalcola usando una mving window 7x7 (sovrascrivendo)
+sdpc1_13 <- focal(pc1_13, matrix(1/49, 7, 7), fun=sd)
+sdpc1_13
+plot(sdpc1_13, col=viridis(200, option="B"))
+sdpc1_22 <- focal(pc1_22, matrix(1/49, 7, 7), fun=sd) 
+sdpc1_22
+plot(sdpc1_22, col=viridis(200, option="B"))
 
