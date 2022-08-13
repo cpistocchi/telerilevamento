@@ -241,3 +241,38 @@ sdpc1_22 <- focal(pc1_22, matrix(1/49, 7, 7), fun=sd)
 sdpc1_22
 plot(sdpc1_22, col=viridis(200, option="B"))
 
+#resample, per rendere più veloci le esecuzioni successive
+lake13res <- aggregate(lake13, fact=10)
+lake22res <- aggregate(lake22, fact=10)
+#PC1
+pca13 <- rasterPCA(lake13res) #2013
+pca22 <- rasterPCA(lake22res) #2022
+pca13
+pca22
+summary(pca13$model) #la PC1 (2013) spiega il 93.9% della variabilità del sistema
+summary(pca22$model) #la PC1 (2022) spiega il 95.2% della variabilità del sistema
+#la PC1 è quindi in grado di rappresentare, in un singolo layer, la maggior parte della variabilità del sistema. 
+#verrà quindi impiegata per misurare la variabilità del sistema.
+#plottando tutte le componenti, si evidenzia come la PC1 anche graficamente mostri meglio la variabilità, discriminando meglio le componenti:
+plot(pca13$map)
+plot(pca22$map)
+#si associa ciascuna PC1 a un oggetto, per facilitare i passaggi successivi
+pc1_13 <- pca13$map$PC1
+pc1_22 <- pca22$map$PC1
+#plot della PC1 per il 2013 (dx) e per il 2022 (sx), con legenda plasma
+par(mfrow=c(1,2))
+plot(pc1_13, col=viridis(200, option="C"))
+plot(pc1_22, col=viridis(200, option="C")) 
+#la variabilità è ben evidenziata da entrambi i plot
+#calcolo della variabilità su PC1 (tale calcolo è possibile effettuarlo su un solo layer)
+sdpc1_13 <- focal(pc1_13, matrix(1/9, 3, 3), fun=sd)
+sdpc1_13
+sdpc1_22 <- focal(pc1_22, matrix(1/9, 3, 3), fun=sd) 
+sdpc1_22
+par(mfrow=c(1,2))
+plot(sdpc1_13, col=viridis(200, option="B"))
+plot(sdpc1_22, col=viridis(200, option="B"))
+#in entrambi i casi, nella sponda nord del lago si ha una elevata eterogeneità (questo quindi non varia nel tempo).
+#considerando anche la classificazione, si vede che tale zona vede aree allagate, umide e vegetate.
+
+
