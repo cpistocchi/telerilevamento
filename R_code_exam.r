@@ -290,5 +290,52 @@ rlist04
 import04 <- lapply(rlist04, raster)
 import04
 lake04 <- stack(import04)
-#
-lake13 #min->max : 0->65535, cioè 65536 valori, immagine a 16 bit
+lake04 #immagine a 16 bit    7771, 7611, 59145081
+#agosto:
+rlist08 <- list.files(pattern="LC08_L2SP_185051_20210824_20210901_02_T1_SR_B")
+rlist08
+import08 <- lapply(rlist08, raster)
+import08
+lake08 <- stack(import08)
+lake08 #immagine a 16 bit   7771, 7621, 59222791
+#ottobre:
+rlist10 <- list.files(pattern="LC08_L2SP_185051_20211027_20211104_02_T1_SR_B")
+rlist10
+import10 <- lapply(rlist10, raster)
+import10
+lake10 <- stack(import10)
+lake10 #immagine a 16 bit    7771, 7611, 59145081
+#dicembre:
+rlist12 <- list.files(pattern="LC09_L2SP_185051_20211222_20220121_02_T1_SR_B")
+rlist12
+import12 <- lapply(rlist12, raster)
+import12
+lake12 <- stack(import12)
+lake12 #immagine a 16 bit   7761, 7611, 59068971
+
+#confronto a colori naturali (con stretch lineare) della situazione nei 4 mesi:
+par(mfrow=c(2,2))
+plotRGB(lake04, r=4, g=3, b=2, stretch="lin")
+plotRGB(lake08, r=4, g=3, b=2, stretch="lin")
+plotRGB(lake10, r=4, g=3, b=2, stretch="lin")
+plotRGB(lake12, r=4, g=3, b=2, stretch="lin")
+
+
+#evidenziamo differenza nella copertura vegetale.
+#NIR nella componente R:
+par(mfrow=c(2,2))
+plotRGB(lake04, r=5, g=4, b=3, stretch="lin")
+plotRGB(lake08, r=5, g=4, b=3, stretch="lin")
+plotRGB(lake10, r=5, g=4, b=3, stretch="lin")
+plotRGB(lake12, r=5, g=4, b=3, stretch="lin")
+#in rosso sono evidenziate le zone con vegetazione
+#per renderlo ancora più evidente,
+#NIR nella componente G, rosso nella R, e verde nella B:
+par(mfrow=c(2,2))
+plotRGB(lake04, r=4, g=5, b=3, stretch="lin")
+plotRGB(lake08, r=4, g=5, b=3, stretch="lin")
+plotRGB(lake10, r=4, g=5, b=3, stretch="lin")
+plotRGB(lake12, r=4, g=5, b=3, stretch="lin")
+#in verde sono evidenziate le zone con vegetazione, mentre in viola intenso l'acqua del lago, delle pozze e del fiume.
+
+
