@@ -31,7 +31,7 @@ setwd("C:/lab/Lake_Chad_Analysis")
 
 #importazione delle immagini a partire dai singoli layer.
 #2013:
-rlist13 <- list.files(pattern="LC08_L2SP_185051_20130412_20200912_02_T1_SR_B") #lista di file (qui bande) relative all'immagine del 2014
+rlist13 <- list.files(pattern="LC08_L2SP_185051_20130412_20200912_02_T1_SR_B") #lista di file (qui bande) relative all'immagine del 2013
 rlist13
 import13 <- lapply(rlist13, raster) #applicazione della funzione raster alle bande selezionate nella lista precedente, per importarle
 import13
@@ -47,7 +47,7 @@ rlist22 <- list.files(pattern="LC08_L2SP_185051_20220405_20220412_02_T1_SR_B") #
 rlist22
 import22 <- lapply(rlist22, raster) #applicazione della funzione raster alle bande selezionate nella lista precedente, per importarle
 import22
-lake22 <- stack(import22) #creazione stack: combinazione dei vari layer relativi al 2013
+lake22 <- stack(import22) #creazione stack: combinazione dei vari layer relativi al 2022
 lake22 #immagine a 16 bit
 
 #plot immagine 2022 (visibile)
@@ -276,3 +276,19 @@ plot(sdpc1_22, col=viridis(200, option="B"))
 #considerando anche la classificazione, si vede che tale zona vede aree allagate, umide e vegetate.
 
 
+
+#ANDAMENTO STAGIONALE 2021
+#Nelle date:
+#02/04: fine stagione secca
+#24/08: max pioggia
+#27/10: fine stagione pioggia
+#22/12: stagione secca
+#importazione delle immagini a partire dai singoli layer.
+#aprile:
+rlist04 <- list.files(pattern="LC08_L2SP_185051_20210402_20210409_02_T1_SR_B")
+rlist04
+import04 <- lapply(rlist04, raster)
+import04
+lake04 <- stack(import04)
+#
+lake13 #min->max : 0->65535, cioè 65536 valori, immagine a 16 bit
