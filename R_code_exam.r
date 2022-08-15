@@ -141,7 +141,7 @@ geom_tile(dvi13, mapping=aes(x=x, y=y, fill=layer)) +
 scale_fill_viridis() #palette di default, ma la risoluzione viene bassissima 
 #oppure, sempre usando viridis
 plot(dvi13, col=viridis(200, option="B")) #palette inferno
-#in giallo-verde sono evidenziate le zone con vegetazione, ma comunque non ha valori elevati di DVI (non sono giallo intenso), quindi non è molto in salute
+#in giallo sono evidenziate le zone con vegetazione, ma comunque non ha valori elevati di DVI (non sono giallo intenso), quindi non è molto in salute
 #(l'immagine è acquisita ad aprile, fine periodo di secca)
 ndvi13 <- dvi13/(lake13[[5]]+lake13[[4]])
 ndvi13
@@ -277,6 +277,8 @@ plot(sdpc1_22, col=viridis(200, option="B"))
 
 
 
+
+
 #ANDAMENTO STAGIONALE 2021
 #Nelle date:
 #02/04: fine stagione secca
@@ -339,3 +341,158 @@ plotRGB(lake12, r=4, g=5, b=3, stretch="lin")
 #in verde sono evidenziate le zone con vegetazione, mentre in viola intenso l'acqua del lago, delle pozze e del fiume.
 
 
+#INDICI SPETTRALI
+#DVI e NDVI (indici di vegetazione)
+#aprile 2021
+dvi04 = lake04[[5]]-lake04[[4]]
+dvi04
+ndvi04 <- dvi04/(lake04[[5]]+lake04[[4]])
+ndvi04
+#agosto 2021
+dvi08 <- lake08[[5]]-lake08[[4]]
+dvi08
+ndvi08 =dvi08/(lake08[[5]]+lake08[[4]])
+ndvi08
+#ottobre 2021
+dvi10 <- lake10[[5]]-lake10[[4]]
+dvi10
+ndvi10 =dvi10/(lake10[[5]]+lake10[[4]])
+ndvi10
+#dicembre 2021
+dvi12 <- lake12[[5]]-lake12[[4]]
+dvi12
+ndvi12 =dvi12/(lake12[[5]]+lake12[[4]])
+ndvi12
+
+#NDVI confrontato per i 4 mesi
+par(mfrow=c(2,2))
+plot(ndvi04, col=viridis(200, option="B")) #inferno
+plot(ndvi08, col=viridis(200, option="B")) #inferno
+plot(ndvi10, col=viridis(200, option="B")) #inferno
+plot(ndvi12, col=viridis(200, option="B")) #inferno
+#in giallo sono evidenziate le zone vegetate. In agosto la vegetazione è più abbondante e più in salute, con poche zone desertiche o aride: il periodo corrisponde all'apice della stagione umida
+
+#NDWI (contenuto di acqua in corpi idrici)
+#aprile 2021
+ndwi04 <- (lake04[[3]]-lake04[[5]]) / (lake04[[3]]+lake04[[5]])
+ndwi04
+#agosto 2021
+ndwi08 <- (lake08[[3]]-lake08[[5]]) / (lake08[[3]]+lake08[[5]])
+ndwi08
+#ottobre 2021
+ndwi10 <- (lake10[[3]]-lake10[[5]]) / (lake10[[3]]+lake10[[5]])
+ndwi10
+#dicembre 2021
+ndwi12 <- (lake12[[3]]-lake12[[5]]) / (lake12[[3]]+lake12[[5]])
+ndwi12
+
+#NDWI confrontato per i 4 mesi
+par(mfrow=c(2,2))
+plot(ndwi04, col=viridis(200, option="E")) #cividis
+plot(ndwi08, col=viridis(200, option="E")) #cividis
+plot(ndwi10, col=viridis(200, option="E")) #cividis
+plot(ndwi12, col=viridis(200, option="E")) #cividis
+
+#confronto NDVI ed NDWI
+par(mfrow=c(2,4))
+plot(ndvi04, col=viridis(200, option="B")) #inferno
+plot(ndvi08, col=viridis(200, option="B")) #inferno
+plot(ndvi10, col=viridis(200, option="B")) #inferno
+plot(ndvi12, col=viridis(200, option="B")) #inferno
+plot(ndwi04, col=viridis(200, option="E")) #cividis
+plot(ndwi08, col=viridis(200, option="E")) #cividis
+plot(ndwi10, col=viridis(200, option="E")) #cividis
+plot(ndwi12, col=viridis(200, option="E")) #cividis
+#dal confronto è visibile come ad aprile vi sia scarsa vegetazione e una moderata presenza di acqua nel lago
+#ad agosto, nel pieno della stagione delle piogge, si assiste ad un aumento della vegetazione, che diventa più rigogliosa, occupando anche le zone umide che normalmente verrebbero evidenziate da valori elevati di NDWI
+#(per questo motivo potrebbe risultare che la copertura di acqua sia diminuita. Contestualizzando questo risultato in base all'andamento stagionale, questo è un risultato dell'aumento della copertura vegetale)
+#ad ottobre, fine della stagione delle piogge, la vegetazione è già diminuita (o comunque in uno stato di salute peggiore rispetto ad agosto)
+#per questo motivo la vegetazione espone nuovamente le zone umide, che coprono una buona superficie
+#lo stesso avviene anche per dicembre, con la differenza che si assiste a una lieve diminuzione della vegetazione e delle zone umide rispetto ad ottobre
+#essendo dicembre ancora all'inizio della stagione secca, si ha un contenuto maggiore di acqua rispetto ad aprile.
+
+#CLASSIFICAZIONE, per disciminare meglio le componenti e valutare numericamente come variano nel tempo la copertura vegetale e il contenuto di acqua nel corpo idrico
+#in 4 classi
+class404 <- unsuperClass(lake04, nClasses=4) #aprile
+class404
+class408 <- unsuperClass(lake08, nClasses=4) #agosto
+class408
+class410 <- unsuperClass(lake10, nClasses=4) #ottobre
+class410
+class412 <- unsuperClass(lake10, nClasses=4) #dicembre
+class412
+par(mfrow=c(2, 2))
+plot(class404$map, col=viridis(4, option="G")) #mako
+plot(class408$map, col=viridis(4, option="G")) #mako
+plot(class410$map, col=viridis(4, option="G")) #mako
+plot(class412$map, col=viridis(4, option="G")) #mako
+#con 4 classi sono ben visibili l'acqua, la vegetazione e le zone con suolo nudo (probabilmente a due livelli diversi di umidità del suolo)
+
+#frequenze (numero di px) per ogni classe
+freq(class404$map) #frequenze 4 classi aprile 2021
+#classe 2 (piante): 11257685 px
+#classe 4 (acqua): 5422670 px
+freq(class408$map) #frequenze 4 classi agosto 2021
+#classe 3 (piante): 20102683 px
+#classe 1 (acqua): 4651143 px
+freq(class410$map) #frequenze 4 classi ottobre 2021
+#classe 1 (piante): 11422391 px
+#classe 2 (acqua): 5242353 px
+freq(class412$map) #frequenze 4 classi dicembre 2021
+#classe 4 (piante): 11808194 px
+#classe 3 (acqua): 5199266 px
+#per capire quanti px totali
+lake04
+tot04 <- 59145081
+lake08
+tot08 <- 59222791
+lake10
+tot10 <- 59145081
+lake12
+tot12 <- 59068971
+#% copertura vegetale
+veg04 <- 11257685/tot04*100 #vegetazione % aprile
+veg04
+veg08 <- 20102683/tot08*100 #vegetazione % agosto
+veg08
+veg10 <- 11422391/tot10*100 #vegetazione % ottobre
+veg10
+veg12 <- 11808194/tot12*100 #vegetazione % dicembre
+veg12
+#% acqua
+acq04 <- 5422670/tot04*100 #acqua % aprile
+acq04
+acq08 <- 4651143/tot08*100 #acqua % agosto
+acq08
+acq10 <- 5242353/tot10*100 #acqua % ottobre
+acq10
+acq12 <- 5199266/tot12*100 #acqua % dicembre
+acq12
+#DATI FINALI
+#% vegetazione aprile: 19.03402%
+#% acqua aprile: 9.168421%
+#% vegetazione agosto: 33.94417%
+#% acqua agosto: 7.853637%
+#% vegetazione ottobre: 19.3125%
+#% acqua ottobre: 8.863549%
+#% vegetazione dicembre: 19.99052%
+#% acqua dicembre: 8.802026%
+#DATAFRAME
+classi <- c("Vegetazione%", "Acqua%") #prima colonna
+perc04 <- c(19.03402, 9.168421) #seconda colonna
+perc08 <- c(33.94417, 7.853637) #terza colonna
+perc10 <- c(19.3125, 8.863549) #quarta colonna
+perc12 <- c(19.99052, 8.802026) #quinta colonna
+multitemporal1 <- data.frame(classi, perc04, perc08, perc10, perc12)
+View(multitemporal1)
+Mesi <- c("04: Aprile", "08: Agosto", "10: Ottobre", "12: Dicembre") #prima colonna
+PercVegetazione <- c(19.03402, 33.94417, 19.3125, 19.99052) #seconda colonna
+PercAcqua <- c(9.168421, 7.853637, 8.863549, 8.802026) #terza colonna
+multitemporal2 <- data.frame(Mesi, PercVegetazione, PercAcqua)
+View(multitemporal2)
+#BARCHART vegetazione nei 4 mesi
+ggplot(multitemporal2, aes(x=Mesi, y=PercVegetazione, col=Mesi))+
+geom_bar(stat="identity", fill="white")
+#BARCHART acqua nei 4 mesi
+ggplot(multitemporal2, aes(x=Mesi, y=PercAcqua, col=Mesi))+
+geom_bar(stat="identity", fill="white")
