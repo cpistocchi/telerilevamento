@@ -490,9 +490,19 @@ PercVegetazione <- c(19.03402, 33.94417, 19.3125, 19.99052) #seconda colonna
 PercAcqua <- c(9.168421, 7.853637, 8.863549, 8.802026) #terza colonna
 multitemporal2 <- data.frame(Mesi, PercVegetazione, PercAcqua)
 View(multitemporal2)
+Mese <- c("04: Aprile", "04: Aprile", "08: Agosto", "08: Agosto", "10: Ottobre", "10: Ottobre", "12: Dicembre", "12: Dicembre") #prima colonna
+Percentuali <- c(19.03402, 9.168421, 33.94417, 7.853637, 19.3125, 8.863549, 19.99052, 8.802026) #seconda colonna
+Tipo_copertura <- c("Vegetazione", "Acqua", "Vegetazione", "Acqua", "Vegetazione", "Acqua", "Vegetazione", "Acqua") #terza colonna
+multitemporal3 <- data.frame(Mese, Percentuali, Tipo_copertura)
+View(multitemporal3)
 #BARCHART vegetazione nei 4 mesi
 ggplot(multitemporal2, aes(x=Mesi, y=PercVegetazione, col=Mesi))+
 geom_bar(stat="identity", fill="white")
 #BARCHART acqua nei 4 mesi
 ggplot(multitemporal2, aes(x=Mesi, y=PercAcqua, col=Mesi))+
 geom_bar(stat="identity", fill="white")
+#BARCHART a colonnne multiple per i 4 mesi
+ggplot(multitemporal3, aes(x=Mese, y=Percentuali, col=Tipo_copertura))+
+geom_bar(stat="identity", fill="white") #sovrapposti
+ggplot(multitemporal3, aes(x=Mese, y=Percentuali, col=Tipo_copertura))+
+geom_bar(stat="identity", position="dodge", fill="white") #colonne affiancate
