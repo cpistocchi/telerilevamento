@@ -55,17 +55,17 @@ plotRGB(lake22, r=4, g=3, b=2, stretch="lin") #stretch lineare
 plotRGB(lake22, r=4, g=3, b=2, stretch="hist") #stretch istogrammi
 
 #confronto visibile 2013-2022 con stretch a istogrammi
+pdf("confronto_colnaturali.pdf", height=4)
 par(mfrow=c(1,2))
 plotRGB(lake13, r=4, g=3, b=2, stretch="hist")
 plotRGB(lake22, r=4, g=3, b=2, stretch="hist")
+dev.off()
 #oppure, con patchwork e RStoolbox:
 plot13 <- ggRGB(lake13, r=4, g=3, b=2, stretch="hist")
 plot22 <- ggRGB(lake22, r=4, g=3, b=2, stretch="hist")
 plot13 + plot22
 
 #le immagini del 2013 e del 2021 sono relative alla stessa zona ma hanno dimensioni leggermente diverse (2013: 55136451 px; 2022: 59145081 px).
-#per questo motivo verranno fatte analisi e considerazioni di carattere qualitativo (e non quantitativo).
-
 
 #CLASSIFICAZIONE, per comprendere meglio di discriminare le componenti
 #in 4 classi
@@ -73,9 +73,11 @@ class413 <- unsuperClass(lake13, nClasses=4)
 class413
 class422 <- unsuperClass(lake22, nClasses=4)
 class422
+pdf("confronto_classificazione.pdf", height=4)
 par(mfrow=c(1, 2))
 plot(class413$map, col=viridis(4, option="G")) #mako
 plot(class422$map, col=viridis(4, option="G")) #mako
+dev.off()
 #con 4 classi sono ben visibili l'acqua, la vegetazione e le zone con suolo nudo (probabilmente a due livelli diversi di umidità del suolo)
 
 #frequenze (numero di px) per ogni classe
@@ -107,21 +109,39 @@ acq22
 classi <- c("Vegetazione%", "Acqua%") #prima colonna
 perc13 <- c(18.25466, 7.020207) #seconda colonna
 perc22 <- c(17.28807, 8.226529) #terza colonna
-multitemporal <- data.frame(classi, perc13, perc22)
-View(multitemporal)
+multitemporal_conf <- data.frame(classi, perc13, perc22)
+View(multitemporal_conf)
+#DATAFRAME
+Anno <- c("2013", "2013", "2022","2022") #prima colonna
+Percent <- c(18.25466, 7.020207, 17.28807, 8.226529) #seconda colonna
+Copertura <- c("Vegetazione", "Acqua", "Vegetazione", "Acqua") #terza colonna
+multitemporal2_conf <- data.frame(Anno, Percent, Copertura)
+View(multitemporal2_conf)
+#DATAFRAME per la costruzione del barchart
+Anni <- c("2013", "2022") #prima colonna
+Perc_Vegetazione <- c(18.25466, 17.28807) #seconda colonna
+Perc_Acqua <- c(7.020207, 8.226529) #terza colonna
+multitemporal3_conf <- data.frame(Anni, Perc_Vegetazione, Perc_Acqua)
+View(multitemporal3_conf)
 #BARCHART 2013
-ggplot(multitemporal, aes(x=classi, y=perc13, col=classi))+
+ggplot(multitemporal_conf, aes(x=classi, y=perc13, col=classi))+
 geom_bar(stat="identity", fill="white")
-#BARCHART
-ggplot(multitemporal, aes(x=classi, y=perc22, col=classi))+
+#BARCHART 2022
+ggplot(multitemporal_conf, aes(x=classi, y=perc22, col=classi))+
 geom_bar(stat="identity", fill="white")
-
+#BARCHART combinato
+pdf("confronto_multitemporal.pdf")
+ggplot(multitemporal2_conf, aes(x=Anno, y=Percent, col=Copertura))+
+geom_bar(stat="identity", position="dodge", fill="white") #colonne affiancate
+dev.off()
 
 #evidenziamo differenza nella copertura vegetale tra il 2013 e il 2022 (aprile: fine periodo secca).
 #NIR nella componente R:
+pdf("confronto_NIR.pdf", height=4)
 par(mfrow=c(1,2))
 plotRGB(lake13, r=5, g=4, b=3, stretch="hist")
 plotRGB(lake22, r=5, g=4, b=3, stretch="hist")
+dev.off()
 #in rosso sono evidenziate le zone con vegetazione
 #per renderlo ancora più evidente,
 #NIR nella componente G, rosso nella R, e verde nella B:
@@ -156,10 +176,11 @@ ndvi22
 plot(ndvi22, col=viridis(200, option="B"))
 
 #affiancando i NDVI 2013-2022
+pdf("confronto_NDVI.pdf", height=4)
 par(mfrow=c(1,2))
 plot(ndvi13, col=viridis(200, option="B"))
 plot(ndvi22, col=viridis(200, option="B"))
-#ha senso confrontarli se hanno un numero diverso di px?
+dev.off()
 
 #indici spettrali immagine 2013
 si13 <- spectralIndices(lake13, green=3, red=4, nir=5)
@@ -181,12 +202,21 @@ ndwi22 <- (lake22[[3]]-lake22[[5]]) / (lake22[[3]]+lake22[[5]])
 ndwi22
 plot(ndwi22, col=viridis(200, option="E")) #cividis
 
+#multiframe NDWI
+pdf("confronto_NDWI.pdf", height=4)
+par(mfrow=c(1,2))
+plot(ndwi13, col=viridis(200, option="E"))
+plot(ndwi22, col=viridis(200, option="E"))
+dev.off()
+
 #multiframe (2013 a dx, 2022 a sx), con NDVI (sopra, legenda inferno) e NDWI (sotto, legenda cividis)
+pdf("confronto_indici.pdf")
 par(mfrow=c(2,2))
 plot(ndvi13, col=viridis(200, option="B"))
 plot(ndvi22, col=viridis(200, option="B"))
 plot(ndwi13, col=viridis(200, option="E"))
 plot(ndwi22, col=viridis(200, option="E"))
+dev.off()
 #sembra che la vegetazione sia diminuita nel 2022 (o lo stato di salute sia peggiorato), 
 #e questo può essere dovuto a fattori climatici ad esempio, come una stagione delle piogge troppo breve ad anticipare quella di secca 
 #(alla fine della quale è stata rilevata l'immagine)
@@ -244,7 +274,7 @@ plot(sdpc1_22, col=viridis(200, option="B"))
 #resample, per rendere più veloci le esecuzioni successive
 lake13res <- aggregate(lake13, fact=10)
 lake22res <- aggregate(lake22, fact=10)
-#PC1
+#PCA
 pca13 <- rasterPCA(lake13res) #2013
 pca22 <- rasterPCA(lake22res) #2022
 pca13
@@ -269,9 +299,11 @@ sdpc1_13 <- focal(pc1_13, matrix(1/9, 3, 3), fun=sd)
 sdpc1_13
 sdpc1_22 <- focal(pc1_22, matrix(1/9, 3, 3), fun=sd) 
 sdpc1_22
+pdf("confronto_variabilità_PC1.pdf", height=4)
 par(mfrow=c(1,2))
 plot(sdpc1_13, col=viridis(200, option="B"))
 plot(sdpc1_22, col=viridis(200, option="B"))
+dev.off()
 #in entrambi i casi, nella sponda nord del lago si ha una elevata eterogeneità (questo quindi non varia nel tempo).
 #considerando anche la classificazione, si vede che tale zona vede aree allagate, umide e vegetate.
 
@@ -316,20 +348,24 @@ lake12 <- stack(import12)
 lake12 #immagine a 16 bit   7761, 7611, 59068971
 
 #confronto a colori naturali (con stretch lineare) della situazione nei 4 mesi:
+pdf("4mesi_colnaturali.pdf")
 par(mfrow=c(2,2))
 plotRGB(lake04, r=4, g=3, b=2, stretch="lin")
 plotRGB(lake08, r=4, g=3, b=2, stretch="lin")
 plotRGB(lake10, r=4, g=3, b=2, stretch="lin")
 plotRGB(lake12, r=4, g=3, b=2, stretch="lin")
+dev.off()
 
 
 #evidenziamo differenza nella copertura vegetale.
 #NIR nella componente R:
+pdf("4mesi_NIR.pdf")
 par(mfrow=c(2,2))
 plotRGB(lake04, r=5, g=4, b=3, stretch="lin")
 plotRGB(lake08, r=5, g=4, b=3, stretch="lin")
 plotRGB(lake10, r=5, g=4, b=3, stretch="lin")
 plotRGB(lake12, r=5, g=4, b=3, stretch="lin")
+dev.off()
 #in rosso sono evidenziate le zone con vegetazione
 #per renderlo ancora più evidente,
 #NIR nella componente G, rosso nella R, e verde nella B:
@@ -365,11 +401,13 @@ ndvi12 =dvi12/(lake12[[5]]+lake12[[4]])
 ndvi12
 
 #NDVI confrontato per i 4 mesi
+pdf("4mesi_NDVI.pdf")
 par(mfrow=c(2,2))
 plot(ndvi04, col=viridis(200, option="B")) #inferno
 plot(ndvi08, col=viridis(200, option="B")) #inferno
 plot(ndvi10, col=viridis(200, option="B")) #inferno
 plot(ndvi12, col=viridis(200, option="B")) #inferno
+dev.off()
 #in giallo sono evidenziate le zone vegetate. In agosto la vegetazione è più abbondante e più in salute, con poche zone desertiche o aride: il periodo corrisponde all'apice della stagione umida
 
 #NDWI (contenuto di acqua in corpi idrici)
@@ -387,13 +425,16 @@ ndwi12 <- (lake12[[3]]-lake12[[5]]) / (lake12[[3]]+lake12[[5]])
 ndwi12
 
 #NDWI confrontato per i 4 mesi
+pdf("4mesi_NDWI.pdf")
 par(mfrow=c(2,2))
 plot(ndwi04, col=viridis(200, option="E")) #cividis
 plot(ndwi08, col=viridis(200, option="E")) #cividis
 plot(ndwi10, col=viridis(200, option="E")) #cividis
 plot(ndwi12, col=viridis(200, option="E")) #cividis
+dev.off()
 
 #confronto NDVI ed NDWI
+pdf("4mesi_confronto.pdf")
 par(mfrow=c(2,4))
 plot(ndvi04, col=viridis(200, option="B")) #inferno
 plot(ndvi08, col=viridis(200, option="B")) #inferno
@@ -403,6 +444,7 @@ plot(ndwi04, col=viridis(200, option="E")) #cividis
 plot(ndwi08, col=viridis(200, option="E")) #cividis
 plot(ndwi10, col=viridis(200, option="E")) #cividis
 plot(ndwi12, col=viridis(200, option="E")) #cividis
+dev.off()
 #dal confronto è visibile come ad aprile vi sia scarsa vegetazione e una moderata presenza di acqua nel lago
 #ad agosto, nel pieno della stagione delle piogge, si assiste ad un aumento della vegetazione, che diventa più rigogliosa, occupando anche le zone umide che normalmente verrebbero evidenziate da valori elevati di NDWI
 #(per questo motivo potrebbe risultare che la copertura di acqua sia diminuita. Contestualizzando questo risultato in base all'andamento stagionale, questo è un risultato dell'aumento della copertura vegetale)
@@ -421,11 +463,13 @@ class410 <- unsuperClass(lake10, nClasses=4) #ottobre
 class410
 class412 <- unsuperClass(lake10, nClasses=4) #dicembre
 class412
+pdf("4mesi_classificazione.pdf")
 par(mfrow=c(2, 2))
 plot(class404$map, col=viridis(4, option="G")) #mako
 plot(class408$map, col=viridis(4, option="G")) #mako
 plot(class410$map, col=viridis(4, option="G")) #mako
 plot(class412$map, col=viridis(4, option="G")) #mako
+dev.off()
 #con 4 classi sono ben visibili l'acqua, la vegetazione e le zone con suolo nudo (probabilmente a due livelli diversi di umidità del suolo)
 
 #frequenze (numero di px) per ogni classe
@@ -490,6 +534,7 @@ PercVegetazione <- c(19.03402, 33.94417, 19.3125, 19.99052) #seconda colonna
 PercAcqua <- c(9.168421, 7.853637, 8.863549, 8.802026) #terza colonna
 multitemporal2 <- data.frame(Mesi, PercVegetazione, PercAcqua)
 View(multitemporal2)
+#DATAFRAME PER BARCHART
 Mese <- c("04: Aprile", "04: Aprile", "08: Agosto", "08: Agosto", "10: Ottobre", "10: Ottobre", "12: Dicembre", "12: Dicembre") #prima colonna
 Percentuali <- c(19.03402, 9.168421, 33.94417, 7.853637, 19.3125, 8.863549, 19.99052, 8.802026) #seconda colonna
 Tipo_copertura <- c("Vegetazione", "Acqua", "Vegetazione", "Acqua", "Vegetazione", "Acqua", "Vegetazione", "Acqua") #terza colonna
@@ -501,8 +546,10 @@ geom_bar(stat="identity", fill="white")
 #BARCHART acqua nei 4 mesi
 ggplot(multitemporal2, aes(x=Mesi, y=PercAcqua, col=Mesi))+
 geom_bar(stat="identity", fill="white")
-#BARCHART a colonnne multiple per i 4 mesi
+#BARCHART a colonnne multiple per i 4 mesi 
 ggplot(multitemporal3, aes(x=Mese, y=Percentuali, col=Tipo_copertura))+
 geom_bar(stat="identity", fill="white") #sovrapposti
+pdf("4mesi_multitemporal.pdf")
 ggplot(multitemporal3, aes(x=Mese, y=Percentuali, col=Tipo_copertura))+
 geom_bar(stat="identity", position="dodge", fill="white") #colonne affiancate
+dev.off()
