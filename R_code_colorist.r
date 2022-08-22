@@ -1,13 +1,13 @@
 # STUDIO DELLA BIODIVERSITà CON IL PACCHETTO COLORIST
 
-#install.packages("colorist")
-#install.packages("ggplot2")
+# install.packages("colorist")
+# install.packages("ggplot2")
 
 # Carichiamo i pacchetti
 library(colorist)
 library(ggplot2)
 
-#ESEMPIO 1: MAPPA DELLA DISTRIBUZIONE DI UNA SPECIE (CICLO ANNUALE 01/01 --> 31/12) - uccello
+# ESEMPIO 1: MAPPA DELLA DISTRIBUZIONE DI UNA SPECIE (CICLO ANNUALE 01/01 --> 31/12) - uccello
 
 # Carichiamo i dati
 data("fiespa_occ")
@@ -44,7 +44,7 @@ map_single(met1_distill, pal)
 legend_timecycle(pal, origin_label="1 jan") # L'argomento origin_label permette di definire il punto di partenza della legenda (in questo caso il 01/01)
 
 
-#ESEMPIO 2: MAPPARE IL COMPORTAMENTO INDIVIDUALE DI UN INDIVIDUO di Pekania pennanti NEL TEMPO (LINEARE, in 9 notti)
+# ESEMPIO 2: MAPPARE IL COMPORTAMENTO INDIVIDUALE DI UN INDIVIDUO di Pekania pennanti NEL TEMPO (LINEARE, in 9 notti)
 
 # Dato
 data("fisher_ud")
