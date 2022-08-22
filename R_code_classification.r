@@ -1,4 +1,4 @@
-#CLASSIFICAZIONE 
+# CLASSIFICAZIONE 
 
 # Pacchetti
 library(raster)
