@@ -1,22 +1,23 @@
 #CLASSIFICAZIONE 
 
-#librerie
+# Pacchetti
 library(raster)
 library(RStoolbox)
-setwd("C:/lab/") #setting working directory
 
-#importazione dei dati
+setwd("C:/lab/") # Setting working directory
+
+# Importazione dei dati
 so <- brick("Solar_Orbiter_s_first_views_of_the_Sun_pillars.jpg")
 so
 
-#plot dell'immagine
+# Plot dell'immagine
 plotRGB(so, 1,2,3, stretch="lin")
 
-#classificazione in 3 classi dell'immagine
+# Classificazione in 3 classi dell'immagine
 soc <- unsuperClass(so, nClasses=3)
 plot(soc$map)
 
-#classificazione in 20 classi dell'immagine
+# Classificazione in 20 classi dell'immagine
 soc20 <- unsuperClass(so, nClasses=20)
 plot(soc20$map,col=cl)
 
@@ -35,15 +36,15 @@ plot(soc20$map,col=cl)
 
 gc <- brick("dolansprings_oli_2013088_canyon_lrg.jpg")
 
-#plot RGB (con stretch lineare o a istogrammi)
+# Plot RGB (con stretch lineare o a istogrammi)
 plotRGB(gc, r=1, g=2, b=3, stretch="lin")
 plotRGB(gc, r=1, g=2, b=3, stretch="hist")
 
-#classificazione immagine in 2 classi
+# Classificazione immagine in 2 classi
 gcc2 <- unsuperClass(gc, nClasses=2)
 gcc2
 plot(gcc2$map)
 
-#classificazione immagine in 4 classi
+# Classificazione immagine in 4 classi
 gcc4 <- unsuperClass(gc, nClasses=4)
 plot(gcc4$map)
