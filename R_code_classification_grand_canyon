@@ -1,52 +1,52 @@
-#CLASSIFICAZIONE (Grand Canyon): discriminazioni di diversi tipi mineralogici nella stessa roccia
+# CLASSIFICAZIONE (Grand Canyon): discriminazioni di diversi tipi mineralogici nella stessa roccia
 
-#librerie
+# Pacchetti
 library(raster)
 library(RStoolbox)
 
-setwd("C:/lab/") #setting working directory
+setwd("C:/lab/") # Setting working directory
 
-#importazione dato
+# Importazione dato
 gc <- brick("dolansprings_oli_2013088_canyon_lrg.jpg")
 gc
-#l'immagine è a 8 bit perchè i valori min e max sono 0->255
-#sono 3 bande, i 3 layer del visibile
-#rosso = 1
-#verde = 2
-#blu = 3
+# L'immagine è a 8 bit perchè i valori min e max sono 0->255
+# Sono 3 bande, i 3 layer del visibile
+# Rosso = 1
+# Verde = 2
+# Blu = 3
 
-#plot RGB dell'immagine (stretch lineare)
+# Plot RGB dell'immagine (stretch lineare)
 plotRGB(gc, r=1, g=2, b=3, stretch="lin")
-#si vede l'immagine come lo si vedrebbe nel visibile, e si vedono differenze fra le rocce, acqua, nuvole e le loro ombre
+# Si vede l'immagine come lo si vedrebbe nel visibile, e si vedono differenze fra le rocce, acqua, nuvole e le loro ombre
 
-#plot RGB dell'immagine (stretch lineare)
-plotRGB(gc, r=1, g=2, b=3, stretch="hist") #risalta il contrasto dell'immagine
+# Plot RGB dell'immagine (stretch lineare)
+plotRGB(gc, r=1, g=2, b=3, stretch="hist") # Risalta il contrasto dell'immagine
 
-#creazione delle classi.
-#alla funzione vanno specifiati negli argomenti: l'immagine da classificare, il numero di classi e, in caso, il numero di px campione (di default è 10000)
+# Creazione delle classi.
+# Alla funzione vanno specifiati negli argomenti: l'immagine da classificare, il numero di classi e, in caso, il numero di px campione (di default è 10000)
 gcclass2 <- unsuperClass (gc, nClasses=2)
 gcclass2
-#ha solo 2 valori, 1 e 2, perchè abbiamo stabilito 2 classi
+# Ha solo 2 valori, 1 e 2, perchè abbiamo stabilito 2 classi
 
-#plot dell'immagine in classi
+# Plot dell'immagine in classi
 plot(gcclass2$map)
-#la classe verde (1) corrisponde alle rocce
-#la classe bianca (2) corrisponde all'acqua e alle ombre o a una particolare differenziazione nelle rocce
-#se in futuro si rifacesse la classificazione, è possibile che il risultato sia un po' diverso perchè i px presi come campione potrebbero essere variabili
-#per mantenere costanti i px campione si usa la funzione set.seed(17) (qui 17 è un esempio)
+# La classe verde (1) corrisponde alle rocce
+# La classe bianca (2) corrisponde all'acqua e alle ombre o a una particolare differenziazione nelle rocce
+# Se in futuro si rifacesse la classificazione, è possibile che il risultato sia un po' diverso perchè i px presi come campione potrebbero essere variabili
+# Per mantenere costanti i px campione si usa la funzione set.seed(17) (qui 17 è un esempio)
 
-#si considera un numero magiore di classi (es 4)
+# Si considera un numero magiore di classi (es 4)
 gcclass4 <- unsuperClass (gc, nClasses=4)
 plot(gcclass4$map)
 
-#per cambiare i colori delle classi
+# Per cambiare i colori delle classi
 clc <- colorRampPalette(c("yellow", "red", "blue", "black"))(100)
 plot(gcclass4$map, col=clc)
-#si vede bene che una classe comprende la rappresentazione delle nuvole alla parte di sabbie
-#un'altra classe comprende l'acqua e le ombre (che assorbono la radiazione luminosa)
-#una terza e quarta classe rappresenta una determinata composizione mineralogica
+# Si vede bene che una classe comprende la rappresentazione delle nuvole alla parte di sabbie
+# Un'altra classe comprende l'acqua e le ombre (che assorbono la radiazione luminosa)
+# Una terza e quarta classe rappresenta una determinata composizione mineralogica
 
-#visualizzazione in un'unica finestra della rappresentazione in 4 classi insieme a quella in colori reali
+# Visualizzazione in un'unica finestra della rappresentazione in 4 classi insieme a quella in colori reali
 par(mfrow=c(2,1))
 plot(gcclass4$map, col=clc)
 plotRGB(gc, r=1, g=2, b=3, stretch="hist")
