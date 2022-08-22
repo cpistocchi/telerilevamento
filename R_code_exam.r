@@ -7,13 +7,11 @@
 # install.packages("RStoolbox")
 # install.packages("patchwork")
 # install.packages("viridis")
-# install.packages("ggplot2")
 
 library(raster)
 library(RStoolbox)
 library(patchwork)
 library(viridis)
-library(ggplot2)
 
 # Setting della cartella di lavoro:
 setwd("C:/lab/Lake_Chad_Analysis") 
