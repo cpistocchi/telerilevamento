@@ -1,43 +1,43 @@
 #VISUALIZZARE E ANALIZZARE DATI LiDAR
-#creare un CHM 
-#area: come di San Genesio (Alto Adige), ambiente forestale
+# Creare un CHM 
+# Area: come di San Genesio (Alto Adige), ambiente forestale
 
-#librerie
+# Pacchetti
 library(raster)
 library(ggplot2)
 library(viridis)
 library(RStoolbox)
 library(lidR) #per vedere la point cloud
 
-setwd("C:/lab/") #setting working directory
+setwd("C:/lab/") # Setting working directory
 
-dsm_2014 <- raster("C:/lab/dati/2013Elevation_DigitalElevationModel-0.5m.tif") #caricamento del file raster con la funzione raster
+dsm_2014 <- raster("C:/lab/dati/2013Elevation_DigitalElevationModel-0.5m.tif") # Caricamento del file raster con la funzione raster
 dsm_2014
-#è un RasterLayer e ne possiamo vedere le dimensioni, la risoluzione (qui 0.5x0.5m)
+# è un RasterLayer e ne possiamo vedere le dimensioni, la risoluzione (qui 0.5x0.5m)
 
 dtm_2014 <- raster("C:/lab/dati/2013Elevation_DigitalTerrainModel-0.5m.tif")
 dtm_2014
 
-#plot del dtm per osservarlo
+# Plot del dtm per osservarlo
 plot(dtm_2014)
-#il plot fornisce come informazione i m s.l.m.
+# Il plot fornisce come informazione i m s.l.m.
 
 chm_2014 <- dsm_2014 - dtm_2014
 chm_2014
 
-#plot con ggplot
+# Plot con ggplot
 ggplot() + 
 geom_raster(chm_2014, mapping = aes(x=x, y=y, fill=layer)) +
 scale_fill_viridis() +
 ggtitle("CHM 2014 San Genesio/Jenesien")
-#al centro dell'immagine si vede bene il paese
-#il blu scuro sono prati, perchè chm=0, attorno al paese
-#poi si vedono le varie case e il bosco attorno (più chiaro, con chm maggiore perchè hanno una maggiore altezza)
+# Al centro dell'immagine si vede bene il paese
+# Il blu scuro sono prati, perchè chm=0, attorno al paese.
+# Poi si vedono le varie case e il bosco attorno (più chiaro, con chm maggiore perchè hanno una maggiore altezza)
 
-#facciamo le operazioni precedenti (calcolo del chm) su dati del 2004
+# Facciamo le operazioni precedenti (calcolo del chm) su dati del 2004
 dsm_2004 <- raster("C:/lab/dati/2004Elevation_DigitalElevationModel-2.5m.tif") #carichiamo il file raster con la funzione raster
 dsm_2004
-#qui la risoluzione è più bassa, cioè di 2.5x2.5 m
+# Qui la risoluzione è più bassa, cioè di 2.5x2.5 m
 
 dtm_2004 <- raster("C:/lab/dati/2004Elevation_DigitalTerrainModel-2.5m.tif")
 dtm_2004
@@ -50,28 +50,28 @@ geom_raster(chm_2004, mapping = aes(x=x, y=y, fill=layer)) +
 scale_fill_viridis() +
 ggtitle("CHM 2004 San Genesio/Jenesien")
 
-#confronto dei due chm per vedere cosa è cambiato in 10 anni, sottraendo chm 2014 e chm 2004
+# Confronto dei due chm per vedere cosa è cambiato in 10 anni, sottraendo chm 2014 e chm 2004
 difference <- chm_2014 - chm_2004
-#errore: i due hanno diversa risoluzione
-#è necessario un ricampionamento (resample), e scegliamo di abbassare la risoluzione dell'immagine più accurata
-#(è sempre preferibile ottenere una risoluzione più grossolana da dati più puntuali e non viceversa)
+# Errore: i due hanno diversa risoluzione
+# è necessario un ricampionamento (resample), e scegliamo di abbassare la risoluzione dell'immagine più accurata
+# (è sempre preferibile ottenere una risoluzione più grossolana da dati più puntuali e non viceversa)
 chm_2014_r <- resample(chm_2014, chm_2004) 
 chm_2014_r 
-#la risoluzione ora è 2.5x2.5
+# La risoluzione ora è 2.5x2.5
 
-difference <- chm_2014_r - chm_2004 #ora funziona!
+difference <- chm_2014_r - chm_2004 # Ora funziona!
 
-#plot di difference con ggplot
+# Plot di difference con ggplot
 ggplot() + 
 geom_raster(difference, mapping=aes(x=x, y=y, fill=layer)) +
 scale_fill_viridis() +
 ggtitle("Difference in CHM")
-#le aree blu scure sono aree in cui i valori sono negativi, quindi probabilmente c'è stato un taglio del bosco
-#le aree più chiare invece c'è stato un aumento in altezza.
-#però la maggior parte della mappa è di colore verde, per cui non ci sono stati cambiamenti di CHM fra le due rilevazioni (probabilmete sono prati)
-#sembra che ci siano stati lievi cambiamenti anche nella zona con le case ma questo probabilmente è dovuto all'approssimazione del resampling (che calcola una media fra i px che sono stati "fusi" fra loro nel resampling)
+# Le aree blu scure sono aree in cui i valori sono negativi, quindi probabilmente c'è stato un taglio del bosco
+# Le aree più chiare invece c'è stato un aumento in altezza.
+# Però la maggior parte della mappa è di colore verde, per cui non ci sono stati cambiamenti di CHM fra le due rilevazioni (probabilmete sono prati)
+# Sembra che ci siano stati lievi cambiamenti anche nella zona con le case ma questo probabilmente è dovuto all'approssimazione del resampling (che calcola una media fra i px che sono stati "fusi" fra loro nel resampling)
 
-#visualizzazione della point cloud
+# Visualizzazione della point cloud
 point_cloud <- readLAS("C:/lab/dati/point_cloud.laz")
-plot(point_cloud) #per vedere il 3D di tutta l'area, e zoomando si devono le case, gli alberi ecc
+plot(point_cloud) # Per vedere il 3D di tutta l'area, e zoomando si devono le case, gli alberi ecc
 
