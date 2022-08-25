@@ -312,74 +312,6 @@ plotRGB(lake22, r=4, g=3, b=2, stretch="hist")
 
 # Le immagini del 2013 e del 2021 sono relative alla stessa zona ma hanno dimensioni leggermente diverse (2013: 55136451 px; 2022: 59145081 px).
 
-# CLASSIFICAZIONE, per comprendere meglio di discriminare le componenti
-# In 4 classi
-class413 <- unsuperClass(lake13, nClasses=4)
-class413
-class422 <- unsuperClass(lake22, nClasses=4)
-class422
-# pdf("confronto_classificazione.pdf", height=4)
-par(mfrow=c(1, 2))
-plot(class413$map, col=viridis(4, option="G")) # mako
-plot(class422$map, col=viridis(4, option="G")) # mako
-# dev.off()
-# Con 4 classi sono ben visibili l'acqua, la vegetazione e le zone con suolo nudo (probabilmente a due livelli diversi di umidità del suolo)
-
-# Frequenze (numero di px) per ogni classe
-freq(class413$map) # Frequenze 4 classi 2013
-# Classe 1 (piante): 10064971 px
-# Classe 2 (acqua): 3870693 px
-freq(class422$map) # Frequenze 4 classi 2022
-# Classe 1 (acqua): 4865587 px
-# Classe 4 (piante): 10225045 px
-# Per capire quanti px totali
-lake13
-tot13 <- 55136451
-lake22
-tot22 <- 59145081
-veg13 <- 10064971/tot13*100 # Vegetazione % nel 2013
-veg13
-veg22 <- 10225045/tot22*100 # Vegetazione % nel 2022
-veg22
-acq13 <- 3870693/tot13*100 # Acqua % nel 2013
-acq13
-acq22 <- 4865587/tot22*100 # Acqua % nel 2022
-acq22
-# DATI FINALI
-# % vegetazione 2013: 18.25466%
-# % acqua 2013: 7.020207%
-# % vegetazione 2022: 17.28807%
-# % acqua 2022: 8.226529%
-# DATAFRAME
-classi <- c("Vegetazione%", "Acqua%") # Prima colonna
-perc13 <- c(18.25466, 7.020207) # Seconda colonna
-perc22 <- c(17.28807, 8.226529) # Terza colonna
-multitemporal_conf <- data.frame(classi, perc13, perc22)
-View(multitemporal_conf)
-# DATAFRAME per la costruzione del barchart combinato
-Anno <- c("2013", "2013", "2022","2022") # Prima colonna
-Percent <- c(18.25466, 7.020207, 17.28807, 8.226529) # Seconda colonna
-Copertura <- c("Vegetazione", "Acqua", "Vegetazione", "Acqua") # Terza colonna
-multitemporal2_conf <- data.frame(Anno, Percent, Copertura)
-View(multitemporal2_conf)
-# DATAFRAME
-Anni <- c("2013", "2022") # Prima colonna
-Perc_Vegetazione <- c(18.25466, 17.28807) # Seconda colonna
-Perc_Acqua <- c(7.020207, 8.226529) # Terza colonna
-multitemporal3_conf <- data.frame(Anni, Perc_Vegetazione, Perc_Acqua)
-View(multitemporal3_conf)
-# BARCHART 2013
-ggplot(multitemporal_conf, aes(x=classi, y=perc13, col=classi))+
-geom_bar(stat="identity", fill="white")
-# BARCHART 2022
-ggplot(multitemporal_conf, aes(x=classi, y=perc22, col=classi))+
-geom_bar(stat="identity", fill="white")
-# BARCHART combinato
-# pdf("confronto_multitemporal.pdf")
-ggplot(multitemporal2_conf, aes(x=Anno, y=Percent, col=Copertura))+
-geom_bar(stat="identity", position="dodge", fill="white") # Colonne affiancate
-# dev.off()
-
 # Evidenziamo differenza nella copertura vegetale tra il 2013 e il 2022 (aprile: fine periodo secca).
 # NIR nella componente R:
 # pdf("confronto_NIR.pdf", height=4)
@@ -479,6 +411,75 @@ plot(ndvi_dif, col=clb) # Valori elevati, in rosso, mostrano una avvenuta perdit
 plot(ndwi_dif, col=clb) # Valori elevati, in rosso, mostrano un aumento dell'acqua sulla superficie, mentre in blu, una perdita di zone con acqua in superficie
 # Le situazioni sono complementari, soprattutto nella parte alta dell'immagine (dove a un aumento della vegetazione corrisponde una diminuzione delle zone sommerse),
 # e nella parte a Nord-Est del lago, dove invece la vegetazione è stata soppiantata dalla presenza dell'acqua.
+
+# CLASSIFICAZIONE, per comprendere meglio di discriminare le componenti
+# In 4 classi
+class413 <- unsuperClass(lake13, nClasses=4)
+class413
+class422 <- unsuperClass(lake22, nClasses=4)
+class422
+# pdf("confronto_classificazione.pdf", height=4)
+par(mfrow=c(1, 2))
+plot(class413$map, col=viridis(4, option="G")) # mako
+plot(class422$map, col=viridis(4, option="G")) # mako
+# dev.off()
+# Con 4 classi sono ben visibili l'acqua, la vegetazione e le zone con suolo nudo (probabilmente a due livelli diversi di umidità del suolo)
+
+# Frequenze (numero di px) per ogni classe
+freq(class413$map) # Frequenze 4 classi 2013
+# Classe 1 (piante): 10064971 px
+# Classe 2 (acqua): 3870693 px
+freq(class422$map) # Frequenze 4 classi 2022
+# Classe 1 (acqua): 4865587 px
+# Classe 4 (piante): 10225045 px
+# Per capire quanti px totali
+lake13
+tot13 <- 55136451
+lake22
+tot22 <- 59145081
+veg13 <- 10064971/tot13*100 # Vegetazione % nel 2013
+veg13
+veg22 <- 10225045/tot22*100 # Vegetazione % nel 2022
+veg22
+acq13 <- 3870693/tot13*100 # Acqua % nel 2013
+acq13
+acq22 <- 4865587/tot22*100 # Acqua % nel 2022
+acq22
+# DATI FINALI
+# % vegetazione 2013: 18.25466%
+# % acqua 2013: 7.020207%
+# % vegetazione 2022: 17.28807%
+# % acqua 2022: 8.226529%
+# DATAFRAME
+classi <- c("Vegetazione%", "Acqua%") # Prima colonna
+perc13 <- c(18.25466, 7.020207) # Seconda colonna
+perc22 <- c(17.28807, 8.226529) # Terza colonna
+multitemporal_conf <- data.frame(classi, perc13, perc22)
+View(multitemporal_conf)
+# DATAFRAME per la costruzione del barchart combinato
+Anno <- c("2013", "2013", "2022","2022") # Prima colonna
+Percent <- c(18.25466, 7.020207, 17.28807, 8.226529) # Seconda colonna
+Copertura <- c("Vegetazione", "Acqua", "Vegetazione", "Acqua") # Terza colonna
+multitemporal2_conf <- data.frame(Anno, Percent, Copertura)
+View(multitemporal2_conf)
+# DATAFRAME
+Anni <- c("2013", "2022") # Prima colonna
+Perc_Vegetazione <- c(18.25466, 17.28807) # Seconda colonna
+Perc_Acqua <- c(7.020207, 8.226529) # Terza colonna
+multitemporal3_conf <- data.frame(Anni, Perc_Vegetazione, Perc_Acqua)
+View(multitemporal3_conf)
+# BARCHART 2013
+ggplot(multitemporal_conf, aes(x=classi, y=perc13, col=classi))+
+geom_bar(stat="identity", fill="white")
+# BARCHART 2022
+ggplot(multitemporal_conf, aes(x=classi, y=perc22, col=classi))+
+geom_bar(stat="identity", fill="white")
+# BARCHART combinato
+# pdf("confronto_multitemporal.pdf")
+ggplot(multitemporal2_conf, aes(x=Anno, y=Percent, col=Copertura))+
+geom_bar(stat="identity", position="dodge", fill="white") # Colonne affiancate
+# dev.off()
+
 
 # MISURE DI ETEROGENEITà: PCA
 # Resample, per rendere più veloci le esecuzioni successive
