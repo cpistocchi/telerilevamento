@@ -6,7 +6,7 @@
 # install.packages("raster")
 # install.packages("RStoolbox")
 # install.packages("viridis")
-# install.packages(""ggplot2")
+# install.packages("ggplot2")
 
 library(raster)
 library(RStoolbox)
